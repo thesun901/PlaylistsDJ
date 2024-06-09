@@ -1,11 +1,10 @@
 <VioletColor@Color>
-    rgba: 9, 0.25, 0.9, 1
+    rgba: 0.9, 0.25, 0.9, 1
 
 <ImageButton@ButtonBehavior+Image>:
     source: 'magic_circle.png'
 
 <MainLayout>
-
     FloatLayout:
         size: root.width, root.height
         canvas.before:
@@ -14,16 +13,39 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        Label:
-            size_hint: 0.4, 0.35
-            pos_hint: {"center_x": 0.5, "center_y": 0.5}
-            background_color: 0.15, 0.15, 0.15, 1
 
-        Image:
-            size_hint: 0.3, 0.3
-            pos_hint: {"center_x": 0.45, "center_y": 0.4}
+
+        AsyncImage:
+            id: track_image
+            size_hint: 0.4, 0.4
+            pos_hint: {"center_x": 0.5, "center_y": 0.55}
+            source: root.track_image_source
+
+        Label:
+            id: song_name
+            color: 0.9, 0.25, 0.9, 1
+            text: "Song name"
+            text_size: self.size
+            font_size: 30
+            pos_hint: {"center_x": 0.5, "center_y": 0.3}
+            size_hint: 0.5, 0.1
+            halign: "center"
+            valign: "middle"
+
+        Label:
+            id: artist_name
+            text: "artist name"
+            font_size: 20
+            pos_hint: {"center_x": 0.5, "center_y": 0.23}
+            size_hint: 0.5, 0.1
+            halign: "center"
+            valign: "middle"
+
+
+
 
         ImageButton:
+            id: stop_start_button
             source: "pictures/stop_button.png"
             size_hint: 0.075, 0.075
             default_size: 0.075, 0.075
@@ -31,6 +53,27 @@
             on_press:
                 root.click_animate(self);
                 root.play_pause(self)
+
+        ImageButton:
+            id: previous
+            source: "pictures/previous.png"
+            size_hint: 0.04, 0.04
+            default_size: 0.04, 0.04
+            pos_hint: {"center_x": 0.42, "center_y": 0.15}
+            on_press:
+                root.click_animate(self);
+                root.previous_song()
+
+
+        ImageButton:
+            id: next
+            source: "pictures/next.png"
+            size_hint: 0.04, 0.04
+            default_size: 0.04, 0.04
+            pos_hint: {"center_x": 0.58, "center_y": 0.15}
+            on_press:
+                root.click_animate(self);
+                root.next_song()
         Image:
             source: "pictures/player_background.png"
             size_hint: 0.58, 0.1
@@ -48,7 +91,7 @@
             pos_hint: {"center_x": 0.5, "center_y": 0.07}
             size_hint: 0.5, 0.1
             min: 0
-            max: 1
+            max: 0.98
             step: 0.01
             orientation: 'horizontal'
             value: 0.5
