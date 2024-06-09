@@ -1,0 +1,57 @@
+<VioletColor@Color>
+    rgba: 9, 0.25, 0.9, 1
+
+<ImageButton@ButtonBehavior+Image>:
+    source: 'magic_circle.png'
+
+<MainLayout>
+
+    FloatLayout:
+        size: root.width, root.height
+        canvas.before:
+            Color:
+                rgba: 0.1, 0.1, 0.1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Label:
+            size_hint: 0.4, 0.35
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            background_color: 0.15, 0.15, 0.15, 1
+
+        Image:
+            size_hint: 0.3, 0.3
+            pos_hint: {"center_x": 0.45, "center_y": 0.4}
+
+        ImageButton:
+            source: "pictures/stop_button.png"
+            size_hint: 0.075, 0.075
+            default_size: 0.075, 0.075
+            pos_hint: {"center_x": 0.5, "center_y": 0.15}
+            on_press:
+                root.click_animate(self);
+                root.play_pause(self)
+        Image:
+            source: "pictures/player_background.png"
+            size_hint: 0.58, 0.1
+            pos_hint: {"center_x": 0.5, "center_y": 0.07}
+            fit_mode: "contain"
+        Slider:
+            id: time_bar
+            padding: 0
+            cursor_size: 20, 20
+            cursor_image: "pictures/slider_cursor.png"
+            value_track: True
+            value_track_color: 0.9, 0.25, 0.9, 1
+            background_horizontal: "pictures/black.png"
+            background_width: 5
+            pos_hint: {"center_x": 0.5, "center_y": 0.07}
+            size_hint: 0.5, 0.1
+            min: 0
+            max: 1
+            step: 0.01
+            orientation: 'horizontal'
+            value: 0.5
+            on_touch_up:
+                root.change_song_moment(args[1], self)
+
