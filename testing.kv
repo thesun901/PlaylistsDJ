@@ -1,15 +1,70 @@
+#:import Factory kivy.factory.Factory
+
+<MyPopup@Popup>
+    pos_hint: {"x": 0.15, "y": 0.15}
+    size_hint: 0.3, 0.3
+
+    auto_dismiss: False
+    title: "Hello"
+    Button:
+        text: 'zamknij'
+        size_hint: 0.2, 0.2
+        on_press: root.dismiss()
+
+<DragCircle>:
+    background_color: (1, 1, 1, 0.3)
+    text: "iol"
+    drag_rectangle: self.x, self.y, self.width, self.height
+    drag_timeout: 10000000
+    drag_distance: 0
+    on_press:
+        if root.good_distance(self.x, self.y, root.width, self.height) != True: \
+        self.x = self.x; \
+        self.y = self.y
 
 
-
-<MainLayout>
+<MainLayout>:
     FloatLayout:
-       size: root.width, root.height
-               canvas.before:
+        size: root.width, root.height
+        canvas.before:
             Color:
                 rgba: 0.1, 0.1, 0.1, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
-       Button:
+
+        Button:
             text: "test"
             id: "test"
+            pos_hint: {"x": 0.6, "y": 0.8}
+            size_hint: 0.3, 0.1
+            on_press: root.btn(); Factory.MyPopup().open()
+        Button:
+            text: "stop"
+            id: "stop"
+            pos_hint: {"x": 0.1, "y": 0.1}
+            size_hint: 0.1, 0.1
+            on_press: root.stop()
+        Button:
+            text: "start"
+            id: "start"
+            pos_hint: {"x": 0.1, "y": 0.25}
+            size_hint: 0.1, 0.1
+            on_press: root.start(); root.animate(self)
+
+
+        RelativeLayout:
+            pos_hint: {"x": 0.7, "y": 0.1}
+            size_hint: (0.3, 0.3)
+            Image:
+                source:'magic_circle.png'
+                size_hint: 1, 1
+            RelativeLayout:
+                pos_hint: {"x": 0.5, "y": 0.5}
+                size_hint: (0.5, 0.5)
+                Image:
+                    source:'magic_circle.png'
+                    size_hint: 1, 1
+
+            DragCircle:
+                size_hint: 0.1, 0.1
