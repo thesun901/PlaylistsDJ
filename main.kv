@@ -1,8 +1,131 @@
+#:import Factory kivy.factory.Factory
+
 <VioletColor@Color>
     rgba: 0.9, 0.25, 0.9, 1
 
 <ImageButton@ButtonBehavior+Image>:
     source: 'magic_circle.png'
+
+<PlaylistPopup@Popup>
+    auto_dismiss: True
+    title: "Load playlist"
+    backgroun_color: 0.2, 0.2, 0.2, 1
+    separator_color: 0.9, 0.25, 0.9, 1
+    size_hint: 0.7, 0.7
+
+    FloatLayout:
+        width: root.width - 100
+        height: root.height - 100
+
+        TextInput:
+            text: "spotify link to playlist"
+            foreground_color: 1, 1, 1, 1
+            id: playlist_link
+            size_hint: 0.65, 0.08
+            pos_hint: {"x": 0.1, "center_y": 0.9}
+            multiline: False
+            background_color: 0.3, 0.3, 0.3, 1
+            on_focus:
+                self.text = "" if self.text == "spotify link to playlist" else self.text
+
+
+
+        Button:
+            pos_hint: {"center_x": 0.9, "center_y": 0.9}
+            size_hint: 0.15, 0.07
+            background_color: 0,0,0,0
+            text: "Load"
+            bold: True
+            color: 1, 1, 1, 1
+            canvas.before:
+                Color:
+                    rgba: (0.9, 0.25, 0.9, 1) if self.state=='normal' else (0,.7,.7,1)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [15,]
+            on_release:
+                root.load_playlist()
+
+        Button:
+            pos_hint: {"center_x": 0.65, "center_y": 0.1}
+            size_hint: 0.25, 0.10
+            background_color: 0,0,0,0
+            text: "Apply"
+            bold: True
+            color: 1, 1, 1, 1
+            canvas.before:
+                Color:
+                    rgba: (0.9, 0.25, 0.9, 1) if self.state=='normal' else (0,.7,.7,1)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [25,]
+            on_release:
+                root.set_root_playlist()
+                root.dismiss()
+
+
+#        Button:
+#            pos_hint: {"center_x": 0.5, "center_y": 0.1}
+#            size_hint: 0.25, 0.10
+#            background_color: 0,0,0,0
+#            text: "Load favourites"
+#            bold: True
+#            color: 1, 1, 1, 1
+#            canvas.before:
+#                Color:
+#                    rgba: (0.116, 0.843, 0.376, 1) if self.state=='normal' else (0,.7,.7,1)
+#                RoundedRectangle:
+#                    pos: self.pos
+#                    size: self.size
+#                    radius: [25,]
+#            on_release:
+
+        Button:
+            pos_hint: {"center_x": 0.35, "center_y": 0.1}
+            size_hint: 0.25, 0.10
+            background_color: 0,0,0,0
+            text: "Cancel"
+            bold: True
+            color: 1, 1, 1, 1
+            canvas.before:
+                Color:
+                    rgba: (0.5, 0.5, 0.5, 1) if self.state=='normal' else (0,.7,.7,1)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [25,]
+            on_release:
+                root.dismiss()
+        AsyncImage:
+            id: popup_playlist_image
+            size_hint: 0.5, 0.5
+            pos_hint: {"center_x": 0.3, "center_y": 0.5}
+            source: root.playlist_image_source
+            color: 0.2, 0.2, 0.2, 0
+
+        Label:
+            id: playlist_name_popup
+            color: 0.9, 0.25, 0.9, 1
+            text: ""
+            text_size: self.size
+            font_size: 30
+            pos_hint: {"x": 0.5, "center_y": 0.6}
+            size_hint: 0.4, 0.2
+            halign: "left"
+            valign: "middle"
+
+        Label:
+            id: tracks_number_popup
+            text: ""
+            text_size: self.size
+            font_size: 20
+            pos_hint: {"x": 0.5, "center_y": 0.5}
+            size_hint: 0.4, 0.1
+            halign: "left"
+            valign: "middle"
+
 
 <MainLayout>
     FloatLayout:
@@ -36,12 +159,43 @@
             id: artist_name
             text: "artist name"
             font_size: 20
-            pos_hint: {"center_x": 0.5, "center_y": 0.23}
+            pos_hint: {"center_x": 0.5, "center_y": 0.25}
             size_hint: 0.5, 0.1
             halign: "center"
             valign: "middle"
 
+        Button:
+            pos_hint: {"center_x": 0.12, "center_y": 0.9}
+            size_hint: 0.15, 0.07
+            background_color: 0,0,0,0
+            text: "Load playlist"
+            bold: True
+            color: 1, 1, 1, 1
+            canvas.before:
+                Color:
+                    rgba: (0.9, 0.25, 0.9, 1) if self.state=='normal' else (0,.7,.7,1)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [25,]
+            on_release:
+                Factory.PlaylistPopup(root).open()
 
+        Label:
+            id: playlist_name
+            size_hint: 0.15, 0.1
+            text_size: self.size
+            pos_hint: {"center_x": 0.2, "center_y": 0.48}
+            text: ""
+            halign: "center"
+            valign: "bottom"
+
+        AsyncImage:
+            id: playlist_image
+            size_hint: 0.15, 0.2
+            pos_hint: {"center_x": 0.2, "center_y": 0.58}
+            fit_mode: "contain"
+            color: 0, 0, 0, 0
 
 
         ImageButton:
@@ -79,6 +233,7 @@
             size_hint: 0.58, 0.1
             pos_hint: {"center_x": 0.5, "center_y": 0.07}
             fit_mode: "contain"
+
         Slider:
             id: time_bar
             padding: 0
@@ -97,4 +252,3 @@
             value: 0.5
             on_touch_up:
                 root.change_song_moment(args[1], self)
-

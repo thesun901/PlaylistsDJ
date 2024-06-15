@@ -1,5 +1,5 @@
 import os
-#os.environ["KIVY_NO_CONSOLELOG"] = "1"
+os.environ["KIVY_NO_CONSOLELOG"] = "1"
 from spotify_setup import sp
 from kivy.app import App
 from kivy.uix.behaviors.drag import DragBehavior

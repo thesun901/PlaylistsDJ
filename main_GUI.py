@@ -2,20 +2,18 @@ import os
 #os.environ["KIVY_NO_CONSOLELOG"] = "1"
 from spotify_setup import sp
 from kivy.app import App
-from kivy.uix.behaviors.drag import DragBehavior
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button, ButtonBehavior
 from kivy.uix.image import Image, AsyncImage
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.popup import Popup
 from kivy.clock import Clock
-import math
-from kivy.uix.label import Label
-import processing_functions
 from kivy.config import Config
 from kivy.properties import StringProperty, VariableListProperty
-from processing_functions import get_current_playback_state
-
+from processing_functions import get_playlist_id_from_url
+from typing import Optional
+from playback_state_functions import start_new_playback, get_current_playback_state, play_pause
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '720')
@@ -24,6 +22,8 @@ Config.set('graphics', 'height', '720')
 PLAY_BUTTON_SRC: str = "pictures/play_button.png"
 PAUSE_BUTTON_SRC: str = "pictures/pause_button.png"
 UPDATE_INTERVAL_SEC: float = 0.3
+
+
 
 class ImageButton(ButtonBehavior, Image):
     pass
@@ -37,6 +37,7 @@ class MainLayout(Screen):
     current_artist_name: str = "artist"
     is_playing: bool = False
     track_image_source: str = u"https://i.scdn.co/image/ab67616d00001e0217c960d3c483b13694bf625d"
+    current_playlist_id: str = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -46,22 +47,33 @@ class MainLayout(Screen):
         except:
             pass
 
-    def btn(self):
-        results = sp.current_user_saved_tracks()
-        print(results)
-        for idx, item in enumerate(results['items']):
-            track = item['track']
-            print(idx, track['artists'][0]['name'], " – ", track['name'])
+    def set_playlist(self, playlist_id: str):
+        self.current_playlist_id = playlist_id
+
+    def update_loaded_playlist_info(self, playlist_info: Optional[dict]):
+        if playlist_info:
+            self.ids.playlist_image.source = playlist_info["images"][0]["url"]
+            self.ids.playlist_image.color = (1, 1, 1, 1)
+            self.ids.playlist_name.text = playlist_info["name"]
+
+            first_song_of_playlist = playlist_info["tracks"]["items"][0]["track"]
+            start_new_playback(song=first_song_of_playlist, context=playlist_info)
+            Clock.schedule_once(lambda dt: self.update_current_info(), 1)
+
 
     def update_timebar_position(self):
         pos = self.current_song_timestamp/self.current_song_length
-        if pos >= 0.99:
+        if pos >= 1:
             self.update_current_info()
             return
         self.ids.time_bar.value = pos
 
     def update_current_info(self):
-        playback_info = get_current_playback_state()
+        try:
+            playback_info = get_current_playback_state()
+        except:
+            return
+
         if playback_info:
             if playback_info["is_playing"]:
                 self.is_playing = True
@@ -72,7 +84,6 @@ class MainLayout(Screen):
 
             self.current_song_timestamp = playback_info['progress_ms']
             self.current_song_length = playback_info['item']['duration_ms']
-            self.update_timebar_position()
 
             self.track_image_source = playback_info['item']['album']['images'][0]['url']
             self.ids.track_image.source = self.track_image_source
@@ -81,22 +92,22 @@ class MainLayout(Screen):
             self.current_artist_name = playback_info['item']['artists'][0]['name']
             self.ids.song_name.text = self.current_song_name
             self.ids.artist_name.text = self.current_artist_name
+
+            self.update_timebar_position()
         else:
             self.current_song_timestamp = self.current_song_length
 
-
     def play_pause(self, widget):
-        playback_info = get_current_playback_state()
-        if playback_info is not None:
-            state = playback_info["is_playing"]
-            if state:
-                widget.source = PLAY_BUTTON_SRC
-                sp.pause_playback()
-                self.is_playing = False
-            else:
-                widget.source = PAUSE_BUTTON_SRC
-                sp.start_playback()
-                self.is_playing = True
+        try:
+            self.is_playing = play_pause()
+        except:
+            return
+
+        if self.is_playing:
+            widget.source = PLAY_BUTTON_SRC
+        else:
+            widget.source = PAUSE_BUTTON_SRC
+
         Clock.schedule_once(lambda dt: self.update_current_info(), 1)
 
     def next_song(self):
@@ -115,20 +126,13 @@ class MainLayout(Screen):
         Clock.schedule_once(lambda dt: self.update_current_info(), 1.5)
 
 
-
     def change_song_moment(self, touch, widget):
         if touch.grab_current == widget:
             playback_info = get_current_playback_state()
-            if self.is_playing:
-                sp.pause_playback()
-                self.is_playing = True
             new_position: int = int(widget.value * self.current_song_length)
-
-            if playback_info['context'] is None:
-                sp.start_playback(uris=[playback_info['item']['uri']], position_ms=new_position)
-            else:
-                sp.start_playback(context_uri=playback_info['context']['uri'], offset={"uri": playback_info['item']['uri']}, position_ms=new_position)
             self.current_song_timestamp = new_position
+            start_new_playback(playback_info['item'], playback_info['context'], position=new_position)
+
 
     def time_updater(self, dt):
         if self.is_playing:
@@ -147,6 +151,35 @@ class MainLayout(Screen):
         )
         anim.start(widget)
 
+
+class PlaylistPopup(Popup):
+    current_playlist_id: Optional[str] = None
+    root_widget: Optional[MainLayout] = None
+    playlist_info: Optional[dict] = None
+    playlist_image_source: Optional[str] = None
+
+    def __init__(self, root_widget: Screen, **kwargs):
+        super().__init__(**kwargs)
+        self.root_widget = root_widget
+
+    def load_playlist(self):
+        self.current_playlist_id = get_playlist_id_from_url(self.ids.playlist_link.text)
+        try:
+            playlist = sp.playlist(playlist_id=self.current_playlist_id)
+            self.playlist_info = playlist
+            self.ids.popup_playlist_image.color = (1, 1, 1, 1)
+            self.ids.popup_playlist_image.source = playlist["images"][0]["url"]
+            self.ids.playlist_name_popup.text = playlist["name"]
+            self.ids.tracks_number_popup.text = f"number of tracks: " + str(playlist["tracks"]["total"])
+        except:
+            self.ids.popup_playlist_image.color = (1, 1, 1, 0)
+            self.ids.popup_playlist_image.source = ""
+            self.ids.playlist_name_popup.text = ""
+            self.ids.tracks_number_popup.text = ""
+
+    def set_root_playlist(self):
+        self.root_widget.set_playlist(self.current_playlist_id)
+        self.root_widget.update_loaded_playlist_info(self.playlist_info)
 
 class MainApp(App):
     def build(self):

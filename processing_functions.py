@@ -1,9 +1,10 @@
 from spotify_setup import sp
-from typing import Optional
+from typing import Optional, Match
 import re
 
+
 def get_playlist_id_from_url(url: str) -> Optional[str]:
-    match = re.search(r'playlist/([a-zA-Z0-9]+)(\?|$)', url)
+    match: Optional[Match[str]] = re.search(r"playlist/([a-zA-Z0-9]+)(\?|$)", url)
     if match:
         return match.group(1)
     else:
@@ -11,10 +12,9 @@ def get_playlist_id_from_url(url: str) -> Optional[str]:
 
 
 def get_audio_features(track_id: str) -> Optional[dict]:
-    features = None
+    features: Optional[dict] = None
     try:
         features = sp.audio_features(track_id)[0]
-        print(type(features))
 
     except Exception as e:
         print(e)
@@ -22,10 +22,10 @@ def get_audio_features(track_id: str) -> Optional[dict]:
     return features
 
 
-def get_all_tracks(playlist_id: str, user_id: str) -> Optional[list]:
+def get_all_tracks(playlist_id: str) -> Optional[list]:
     tracks = None
     try:
-        results = sp.user_playlist_tracks(playlist_id=playlist_id, user=user_id)
+        results = sp.playlist_items(playlist_id=playlist_id)
         tracks = results['items']
 
         while results['next']:
@@ -35,13 +35,5 @@ def get_all_tracks(playlist_id: str, user_id: str) -> Optional[list]:
         print(e)
 
     return tracks
-
-
-def get_current_playback_state() -> Optional[dict]:
-    try:
-        return sp.current_playback()
-
-    except:
-        return None
 
 
