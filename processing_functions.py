@@ -11,15 +11,26 @@ def get_playlist_id_from_url(url: str) -> Optional[str]:
         return None
 
 
-def get_audio_features(track_id: str) -> Optional[dict]:
-    features: Optional[dict] = None
-    try:
-        features = sp.audio_features(track_id)[0]
+def get_audio_features(tracks: list[dict]) -> Optional[list[dict]]:
+    tracks_id = []
+    for item in tracks:
+        tracks_id.append(item['track']['id'])
+    print(tracks_id)
+    features_list: Optional[list[dict]] = []
 
-    except Exception as e:
-        print(e)
+    # api call has limit of 100 songs - getting all song features from playlist
+    while len(tracks_id) > 0:
+        try:
+            result = sp.audio_features(tracks=tracks_id[:100])
+            features_list.extend(result)
+            tracks_id = tracks_id[100:] if len(tracks_id) > 100 else []
 
-    return features
+        except Exception as e:
+            print(e)
+            return None
+
+    print(features_list)
+    return features_list
 
 
 def get_all_tracks(playlist_id: str) -> Optional[list]:

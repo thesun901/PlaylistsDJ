@@ -3,11 +3,10 @@ from spotify_setup import sp
 import math
 
 class Track:
-    def __init__(self, song: dict):
+    def __init__(self, song: dict, features: dict):
         self.id: str = song['id']
         self.uri = song['uri']
         self.name = song['name']
-        features = processing_functions.get_audio_features(self.id)
         self.loudness = features['loudness']
         self.energy = features['energy']
         self.instrumentalness = features['instrumentalness']
@@ -23,8 +22,12 @@ class Playlist:
         self.image: str = playlist_dict['images'][0]['url']
         self.tracklist = []
         playlist_tracks = processing_functions.get_all_tracks(self.id)
-        for item in playlist_tracks:
-            self.tracklist.append(Track(item['track']))
+        songs_features = processing_functions.get_audio_features(playlist_tracks)
+        print(songs_features)
+       # print(playlist_tracks)
+
+        for item, features in zip(playlist_tracks, songs_features):
+            self.tracklist.append(Track(item['track'], features))
 
 
 class TrackNode:
