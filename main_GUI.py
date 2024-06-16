@@ -24,7 +24,6 @@ PAUSE_BUTTON_SRC: str = "pictures/pause_button.png"
 UPDATE_INTERVAL_SEC: float = 0.3
 
 
-
 class ImageButton(ButtonBehavior, Image):
     pass
 
@@ -150,6 +149,10 @@ class MainLayout(Screen):
             duration=0.1
         )
         anim.start(widget)
+
+
+class OnePointSearchLayout(Screen):
+    pass
 
 
 class PlaylistPopup(Popup):
