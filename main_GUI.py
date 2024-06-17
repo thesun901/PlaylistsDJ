@@ -14,6 +14,7 @@ from kivy.properties import StringProperty, VariableListProperty
 from processing_functions import get_playlist_id_from_url
 from typing import Optional
 from playback_state_functions import start_new_playback, get_current_playback_state, play_pause
+from kivy.lang import Builder
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '720')
@@ -25,6 +26,9 @@ UPDATE_INTERVAL_SEC: float = 0.3
 
 
 class ImageButton(ButtonBehavior, Image):
+    pass
+
+class WindowManager(ScreenManager):
     pass
 
 
@@ -150,6 +154,8 @@ class MainLayout(Screen):
         )
         anim.start(widget)
 
+    def one_point_mode(self):
+        pass
 
 class OnePointSearchLayout(Screen):
     pass
@@ -186,7 +192,11 @@ class PlaylistPopup(Popup):
 
 class MainApp(App):
     def build(self):
-        return MainLayout()
+        sm = ScreenManager()
+        sm.add_widget(MainLayout(name='player'))
+        sm.add_widget(OnePointSearchLayout(name='onepoint'))
+        return sm
+
 
 
 if __name__ == '__main__':

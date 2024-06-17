@@ -50,10 +50,10 @@ class TracksGraph:
 
         self.loudness_relevant = True
         self.energy_relevant = True
-        self.instrumentalness_relevant = False
+        self.instrumentalness_relevant = True
         self.tempo_relevant = True
-        self.valence_relevant = False
-        self.danceability_relevant = False
+        self.valence_relevant = True
+        self.danceability_relevant = True
 
         self.build_graph()
 
@@ -176,7 +176,7 @@ def is_connected(graph):
     return len(visited) == len(graph.nodes)
 
 if __name__ == '__main__':
-    playlist_id = processing_functions.get_playlist_id_from_url('https://open.spotify.com/playlist/05BoR0n9Ehp1hSE4KtRYjy?si=3ce3ea1b4cd0456d')
+    playlist_id = processing_functions.get_playlist_id_from_url('https://open.spotify.com/playlist/1JgWNIzMDNCybnXHLh6Hgh?si=89c17b0a16eb4672')
     pl = Playlist(sp.playlist(playlist_id))
 
     # Create graph

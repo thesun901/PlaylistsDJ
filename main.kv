@@ -1,4 +1,8 @@
 #:import Factory kivy.factory.Factory
+WindowManager:
+    MainLayout:
+    OnePointSearchLayout:
+
 
 <VioletColor@Color>
     rgba: 0.9, 0.25, 0.9, 1
@@ -9,7 +13,6 @@
 <PlaylistPopup@Popup>
     auto_dismiss: True
     title: "Load playlist"
-    backgroun_color: 0.2, 0.2, 0.2, 1
     separator_color: 0.9, 0.25, 0.9, 1
     size_hint: 0.7, 0.7
 
@@ -234,6 +237,14 @@
             pos_hint: {"center_x": 0.5, "center_y": 0.07}
             fit_mode: "contain"
 
+        Button:
+            size_hint: 0.2, 0.1
+            pos_hint: {"center_x": 0.8, "center_y": 0.2}
+            text: "onepoint"
+            on_release:
+                root.manager.transition.direction = "left"
+                app.root.current = "onepoint"
+
         Slider:
             id: time_bar
             padding: 0
@@ -252,3 +263,132 @@
             value: 0.5
             on_touch_up:
                 root.change_song_moment(args[1], self)
+
+
+<OnePointSearchLayout>:
+    FloatLayout:
+        size: root.width, root.height
+        canvas.before:
+            Color:
+                rgba: 0.1, 0.1, 0.1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        CheckBox:
+            id: loudness_checkbox
+            pos_hint: {"center_x": 0.1, "center_y": 0.8}
+            background_checkbox_down: "pictures/checkbox_down.png"
+            background_checkbox_normal: "pictures/checkbox_normal.png"
+
+
+        Slider:
+            id: loudness_slider
+            padding: 0
+            cursor_size: 20, 20
+            cursor_image: "pictures/slider_cursor.png"
+            value_track: True
+            value_track_color: 0.9, 0.25, 0.9, 1
+            background_horizontal: "pictures/black.png"
+            background_width: 5
+            pos_hint: {"center_x": 0.3, "center_y": 0.8}
+            size_hint: 0.3, 0.1
+            min: 0
+            max: 1
+            step: 0.01
+            orientation: 'horizontal'
+            value: 0.5
+
+        Slider:
+            id: energy_slider
+            padding: 0
+            cursor_size: 20, 20
+            cursor_image: "pictures/slider_cursor.png"
+            value_track: True
+            value_track_color: 0.9, 0.25, 0.9, 1
+            background_horizontal: "pictures/black.png"
+            background_width: 5
+            pos_hint: {"center_x": 0.3, "center_y": 0.7}
+            size_hint: 0.3, 0.1
+            min: 0
+            max: 1
+            step: 0.01
+            orientation: 'horizontal'
+            value: 0.5
+
+        Slider:
+            id: instrumentalness_slider
+            padding: 0
+            cursor_size: 20, 20
+            cursor_image: "pictures/slider_cursor.png"
+            value_track: True
+            value_track_color: 0.9, 0.25, 0.9, 1
+            background_horizontal: "pictures/black.png"
+            background_width: 5
+            pos_hint: {"center_x": 0.3, "center_y": 0.6}
+            size_hint: 0.3, 0.1
+            min: 0
+            max: 1
+            step: 0.01
+            orientation: 'horizontal'
+            value: 0.5
+
+        Slider:
+            id: tempo_slider
+            padding: 0
+            cursor_size: 20, 20
+            cursor_image: "pictures/slider_cursor.png"
+            value_track: True
+            value_track_color: 0.9, 0.25, 0.9, 1
+            background_horizontal: "pictures/black.png"
+            background_width: 5
+            pos_hint: {"center_x": 0.3, "center_y": 0.5}
+            size_hint: 0.3, 0.1
+            min: 0
+            max: 1
+            step: 0.01
+            orientation: 'horizontal'
+            value: 0.5
+
+        Slider:
+            id: valence_slider
+            padding: 0
+            cursor_size: 20, 20
+            cursor_image: "pictures/slider_cursor.png"
+            value_track: True
+            value_track_color: 0.9, 0.25, 0.9, 1
+            background_horizontal: "pictures/black.png"
+            background_width: 5
+            pos_hint: {"center_x": 0.3, "center_y": 0.4}
+            size_hint: 0.3, 0.1
+            min: 0
+            max: 1
+            step: 0.01
+            orientation: 'horizontal'
+            value: 0.5
+
+
+        Slider:
+            id: danceability_slider
+            padding: 0
+            cursor_size: 20, 20
+            cursor_image: "pictures/slider_cursor.png"
+            value_track: True
+            value_track_color: 0.9, 0.25, 0.9, 1
+            background_horizontal: "pictures/black.png"
+            background_width: 5
+            pos_hint: {"center_x": 0.3, "center_y": 0.3}
+            size_hint: 0.3, 0.1
+            min: 0
+            max: 1
+            step: 0.01
+            orientation: 'horizontal'
+            value: 0.5
+
+        Button:
+            text: "back"
+            pos_hint: {"center_x": 0.1, "center_y": 0.1}
+            size_hint: 0.2, 0.1
+            on_release:
+                root.manager.transition.direction = "right"
+                app.root.current = "player"
