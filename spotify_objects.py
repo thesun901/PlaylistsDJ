@@ -23,8 +23,6 @@ class Playlist:
         self.tracklist = []
         playlist_tracks = processing_functions.get_all_tracks(self.id)
         songs_features = processing_functions.get_audio_features(playlist_tracks)
-        print(songs_features)
-       # print(playlist_tracks)
 
         for item, features in zip(playlist_tracks, songs_features):
             self.tracklist.append(Track(item['track'], features))
@@ -48,9 +46,9 @@ class TracksGraph:
         self.nodes = []
         self._normalize_features(playlist.tracklist)
 
-        self.loudness_relevant = True
-        self.energy_relevant = True
-        self.instrumentalness_relevant = True
+        self.loudness_relevant = False
+        self.energy_relevant = False
+        self.instrumentalness_relevant = False
         self.tempo_relevant = True
         self.valence_relevant = True
         self.danceability_relevant = True
@@ -107,6 +105,24 @@ class TracksGraph:
             distance += (node1.danceability_dimention - node2.danceability_dimention) ** 2
         return math.sqrt(distance)
 
+    def _distance_point(self, node: TrackNode, loudness: float, energy: float,
+                        instrumentalness: float, tempo: float, valence: float, danceability: float) -> float:
+        # Calculate distance considering only relevant dimensions
+        distance = 0
+        if self.loudness_relevant:
+            distance += (node.loudness_dimention - loudness) ** 2
+        if self.energy_relevant:
+            distance += (node.energy_dimention - energy) ** 2
+        if self.instrumentalness_relevant:
+            distance += (node.instrumentalness_dimention - instrumentalness) ** 2
+        if self.tempo_relevant:
+            distance += (node.tempo_dimention - tempo) ** 2
+        if self.valence_relevant:
+            distance += (node.valence_dimention - valence) ** 2
+        if self.danceability_relevant:
+            distance += (node.danceability_dimention - danceability) ** 2
+        return math.sqrt(distance)
+
     def build_graph(self):
         for node in self.nodes:
             distances = []
@@ -124,7 +140,7 @@ class TracksGraph:
         self._ensure_connectivity()
 
     def _ensure_connectivity(self):
-        # Perform DFS to check connectivity
+        # Perform BFS to check connectivity
         visited = set()
         to_visit = [self.nodes[0]] if self.nodes else []
 
@@ -151,6 +167,29 @@ class TracksGraph:
                     closest_visited_node.neighbours.add(unvisited_node)
                     visited.add(unvisited_node)
 
+    def get_one_point_queue(self, values: dict, percentage: float):
+        amount: int = int(len(self.nodes) * percentage)
+        queue: list = []
+        loudness: float = values['loudness']
+        energy: float = values['energy']
+        instrumentalness: float = values['instrumentalness']
+        tempo: float = values['tempo']
+        valence: float = values['valence']
+        danceability: float = values['danceability']
+
+        distances: list[tuple] = []
+        for node in self.nodes:
+            distances.append((node, self._distance_point(node, loudness, energy,
+                             instrumentalness, tempo, valence, danceability)))
+
+        distances.sort(key=lambda x: x[1])
+
+        for i in range(amount):
+            queue.append(distances[i][0].track.uri)
+
+        return queue
+
+
 
 # Check the graph structure
 def print_graph(graph):
@@ -176,17 +215,32 @@ def is_connected(graph):
     return len(visited) == len(graph.nodes)
 
 if __name__ == '__main__':
-    playlist_id = processing_functions.get_playlist_id_from_url('https://open.spotify.com/playlist/1JgWNIzMDNCybnXHLh6Hgh?si=89c17b0a16eb4672')
+    playlist_id = processing_functions.get_playlist_id_from_url('https://open.spotify.com/playlist/657uAFl5hSMc8f493QEid0?si=64605511a4d243bc')
     pl = Playlist(sp.playlist(playlist_id))
+    vals = {
+        "loudness": 1,
+        "energy": 1,
+        "instrumentalness": 1,
+        "tempo": 0,
+        "valence": 0,
+        "danceability": 0
+    }
+    graph = TracksGraph(pl)
+    print(graph.get_one_point_queue(vals, 0.5))
 
     # Create graph
-    graph = TracksGraph(pl)
+
     # Print the graph
-    print_graph(graph)
+
+
+    # print_graph(graph)
+
+
+
 
     # Check if the graph is connected
-    connected = is_connected(graph)
-    print("Is graph fully connected?", connected)
+   # connected = is_connected(graph)
+   # print("Is graph fully connected?", connected)
 
 
 

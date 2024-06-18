@@ -2,6 +2,7 @@
 WindowManager:
     MainLayout:
     OnePointSearchLayout:
+        id: one_point_layout
 
 
 <VioletColor@Color>
@@ -10,6 +11,7 @@ WindowManager:
 <ImageButton@ButtonBehavior+Image>:
     source: 'magic_circle.png'
 
+#-----------------------------------------POPUPS---------------------------------------------------------
 <PlaylistPopup@Popup>
     auto_dismiss: True
     title: "Load playlist"
@@ -129,7 +131,25 @@ WindowManager:
             halign: "left"
             valign: "middle"
 
+<NoPlaylistLoadedPopup@Popup>
+    auto_dismiss: True
+    title: "You should load playlist!"
+    separator_color: 0.9, 0.25, 0.9, 1
+    size_hint: 0.7, 0.7
 
+    FloatLayout:
+        width: root.width - 100
+        height: root.height - 100
+
+        Label:
+            text: "It seems you haven't loaded playlist to app yet!\nGo back to main screen and load your playlist!"
+            size_hint: 0.65, 0.3
+            pos_hint: {"x": 0.3, "center_y": 0.6}
+
+#-----------------------------------------POPUPS---------------------------------------------------------
+
+
+#----------------------------------------MAIN-LAYOUT---------------------------------------------------
 <MainLayout>
     FloatLayout:
         size: root.width, root.height
@@ -203,7 +223,7 @@ WindowManager:
 
         ImageButton:
             id: stop_start_button
-            source: "pictures/stop_button.png"
+            source: "pictures/pause_button.png"
             size_hint: 0.075, 0.075
             default_size: 0.075, 0.075
             pos_hint: {"center_x": 0.5, "center_y": 0.15}
@@ -243,6 +263,7 @@ WindowManager:
             text: "onepoint"
             on_release:
                 root.manager.transition.direction = "left"
+                root.one_point_mode()
                 app.root.current = "onepoint"
 
         Slider:
@@ -263,7 +284,7 @@ WindowManager:
             value: 0.5
             on_touch_up:
                 root.change_song_moment(args[1], self)
-
+#----------------------------------------MAIN-LAYOUT---------------------------------------------------
 
 <OnePointSearchLayout>:
     FloatLayout:
@@ -275,12 +296,20 @@ WindowManager:
                 pos: self.pos
                 size: self.size
 
+        Label:
+            pos_hint: {"center_x": 0.2, "center_y": 0.85}
+            size_hint: 0.2, 0.2
+            text: "Loudness"
+
         CheckBox:
             id: loudness_checkbox
             pos_hint: {"center_x": 0.1, "center_y": 0.8}
+            size_hint: 0.05, 0.05
+            active: True
             background_checkbox_down: "pictures/checkbox_down.png"
             background_checkbox_normal: "pictures/checkbox_normal.png"
-
+            on_release:
+                root.update_states()
 
         Slider:
             id: loudness_slider
@@ -288,8 +317,9 @@ WindowManager:
             cursor_size: 20, 20
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
-            value_track_color: 0.9, 0.25, 0.9, 1
+            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
             background_horizontal: "pictures/black.png"
+            cursor_disabled_image: "pictures/no_image.png"
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.8}
             size_hint: 0.3, 0.1
@@ -299,14 +329,29 @@ WindowManager:
             orientation: 'horizontal'
             value: 0.5
 
+        Label:
+            pos_hint: {"center_x": 0.2, "center_y": 0.75}
+            size_hint: 0.2, 0.2
+            text: "Energy"
+
+        CheckBox:
+            id: energy_checkbox
+            pos_hint: {"center_x": 0.1, "center_y": 0.7}
+            size_hint: 0.05, 0.05
+            active: True
+            background_checkbox_down: "pictures/checkbox_down.png"
+            background_checkbox_normal: "pictures/checkbox_normal.png"
+            on_release:
+                root.update_states()
         Slider:
             id: energy_slider
             padding: 0
             cursor_size: 20, 20
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
-            value_track_color: 0.9, 0.25, 0.9, 1
+            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
             background_horizontal: "pictures/black.png"
+            cursor_disabled_image: "pictures/no_image.png"
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.7}
             size_hint: 0.3, 0.1
@@ -315,15 +360,29 @@ WindowManager:
             step: 0.01
             orientation: 'horizontal'
             value: 0.5
+        Label:
+            pos_hint: {"center_x": 0.2, "center_y": 0.65}
+            size_hint: 0.2, 0.2
+            text: "Instrumentalness"
 
+        CheckBox:
+            id: instrumentalness_checkbox
+            pos_hint: {"center_x": 0.1, "center_y": 0.6}
+            size_hint: 0.05, 0.05
+            active: True
+            background_checkbox_down: "pictures/checkbox_down.png"
+            background_checkbox_normal: "pictures/checkbox_normal.png"
+            on_release:
+                root.update_states()
         Slider:
             id: instrumentalness_slider
             padding: 0
             cursor_size: 20, 20
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
-            value_track_color: 0.9, 0.25, 0.9, 1
+            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
             background_horizontal: "pictures/black.png"
+            cursor_disabled_image: "pictures/no_image.png"
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.6}
             size_hint: 0.3, 0.1
@@ -333,14 +392,29 @@ WindowManager:
             orientation: 'horizontal'
             value: 0.5
 
+        Label:
+            pos_hint: {"center_x": 0.2, "center_y": 0.55}
+            size_hint: 0.2, 0.2
+            text: "Tempo"
+
+        CheckBox:
+            id: tempo_checkbox
+            pos_hint: {"center_x": 0.1, "center_y": 0.5}
+            size_hint: 0.05, 0.05
+            active: True
+            background_checkbox_down: "pictures/checkbox_down.png"
+            background_checkbox_normal: "pictures/checkbox_normal.png"
+            on_release:
+                root.update_states()
         Slider:
             id: tempo_slider
             padding: 0
             cursor_size: 20, 20
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
-            value_track_color: 0.9, 0.25, 0.9, 1
+            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
             background_horizontal: "pictures/black.png"
+            cursor_disabled_image: "pictures/no_image.png"
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.5}
             size_hint: 0.3, 0.1
@@ -350,14 +424,30 @@ WindowManager:
             orientation: 'horizontal'
             value: 0.5
 
+        Label:
+            pos_hint: {"center_x": 0.2, "center_y": 0.45}
+            size_hint: 0.2, 0.2
+            text: "Valence"
+
+        CheckBox:
+            id: valence_checkbox
+            pos_hint: {"center_x": 0.1, "center_y": 0.4}
+            size_hint: 0.05, 0.05
+            active: True
+            background_checkbox_down: "pictures/checkbox_down.png"
+            background_checkbox_normal: "pictures/checkbox_normal.png"
+            on_release:
+                root.update_states()
+
         Slider:
             id: valence_slider
             padding: 0
             cursor_size: 20, 20
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
-            value_track_color: 0.9, 0.25, 0.9, 1
+            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
             background_horizontal: "pictures/black.png"
+            cursor_disabled_image: "pictures/no_image.png"
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.4}
             size_hint: 0.3, 0.1
@@ -367,6 +457,20 @@ WindowManager:
             orientation: 'horizontal'
             value: 0.5
 
+        Label:
+            pos_hint: {"center_x": 0.2, "center_y": 0.35}
+            size_hint: 0.2, 0.2
+            text: "Danceability"
+
+        CheckBox:
+            id: danceability_checkbox
+            pos_hint: {"center_x": 0.1, "center_y": 0.3}
+            size_hint: 0.05, 0.05
+            active: True
+            background_checkbox_down: "pictures/checkbox_down.png"
+            background_checkbox_normal: "pictures/checkbox_normal.png"
+            on_release:
+                root.update_states()
 
         Slider:
             id: danceability_slider
@@ -374,8 +478,9 @@ WindowManager:
             cursor_size: 20, 20
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
-            value_track_color: 0.9, 0.25, 0.9, 1
+            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
             background_horizontal: "pictures/black.png"
+            cursor_disabled_image: "pictures/no_image.png"
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.3}
             size_hint: 0.3, 0.1
@@ -385,10 +490,77 @@ WindowManager:
             orientation: 'horizontal'
             value: 0.5
 
+        Label:
+            text: "percentage of playlist returned"
+            font_size: 20
+            pos_hint: {"center_x": 0.7, "center_y": 0.65}
+            size_hint: 0.2, 0.2
+            valign: "center"
+            halign: "center"
+
+
+        Label:
+            id: percentage_label
+            font_size: 40
+            color: (0.9, 0.25, 0.9, 1)
+            pos_hint: {"center_x": 0.7, "center_y": 0.5}
+            size_hint: 0.2, 0.2
+            valign: "center"
+            halign: "center"
+
+        Slider:
+            id: percentage_slider
+            padding: 0
+            cursor_size: 20, 20
+            cursor_image: "pictures/slider_cursor.png"
+            value_track: True
+            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
+            background_horizontal: "pictures/black.png"
+            cursor_disabled_image: "pictures/no_image.png"
+            background_width: 5
+            pos_hint: {"center_x": 0.7, "center_y": 0.3}
+            size_hint: 0.4, 0.1
+            min: 0
+            max: 0.5
+            step: 0.01
+            orientation: 'horizontal'
+            value: 0.5
+            on_touch_move:
+                root.update_states()
+
         Button:
-            text: "back"
-            pos_hint: {"center_x": 0.1, "center_y": 0.1}
+            text: "Back"
+            pos_hint: {"center_x": 0.3, "center_y": 0.1}
             size_hint: 0.2, 0.1
+            background_color: 0,0,0,0
+            bold: True
+            color: 1, 1, 1, 1
+            canvas.before:
+                Color:
+                    rgba: (0.5, 0.5, 0.5, 1) if self.state=='normal' else (0,.7,.7,1)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [15,]
             on_release:
+                root.manager.transition.direction = "right"
+                app.root.current = "player"
+
+        Button:
+            text: "Apply"
+            pos_hint: {"center_x": 0.4, "center_y": 0.1}
+            size_hint: 0.2, 0.1
+            background_color: 0,0,0,0
+            bold: True
+            color: 1, 1, 1, 1
+            canvas.before:
+                Color:
+                    rgba: (0.9, 0.25, 0.9, 1) if self.state=='normal' else (0,.7,.7,1)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [15,]
+            on_release:
+                root.apply_one_point_search()
                 root.manager.transition.direction = "right"
                 app.root.current = "player"

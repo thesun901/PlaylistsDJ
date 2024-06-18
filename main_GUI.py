@@ -3,17 +3,17 @@ import os
 from spotify_setup import sp
 from kivy.app import App
 from kivy.animation import Animation
-from kivy.uix.widget import Widget
-from kivy.uix.button import Button, ButtonBehavior
-from kivy.uix.image import Image, AsyncImage
+from kivy.uix.button import ButtonBehavior
+from kivy.uix.image import Image
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
 from kivy.config import Config
-from kivy.properties import StringProperty, VariableListProperty
+from kivy.properties import VariableListProperty
 from processing_functions import get_playlist_id_from_url
 from typing import Optional
 from playback_state_functions import start_new_playback, get_current_playback_state, play_pause
+from spotify_objects import TracksGraph, Playlist
 from kivy.lang import Builder
 
 Config.set('graphics', 'width', '1200')
@@ -30,6 +30,7 @@ class ImageButton(ButtonBehavior, Image):
 
 class WindowManager(ScreenManager):
     pass
+
 
 
 class MainLayout(Screen):
@@ -125,9 +126,9 @@ class MainLayout(Screen):
             if playback_info['context'] is None:
                 sp.start_playback(uris=[playback_info['item']['uri']], position_ms=0)
             else:
-                sp.start_playback(context_uri=playback_info['context']['uri'], offset={"uri": playback_info['item']['uri']}, position_ms=0)
+                sp.start_playback(context_uri=playback_info['context']['uri'],
+                                  offset={"uri": playback_info['item']['uri']}, position_ms=0)
         Clock.schedule_once(lambda dt: self.update_current_info(), 1.5)
-
 
     def change_song_moment(self, touch, widget):
         if touch.grab_current == widget:
@@ -135,6 +136,9 @@ class MainLayout(Screen):
             new_position: int = int(widget.value * self.current_song_length)
             self.current_song_timestamp = new_position
             start_new_playback(playback_info['item'], playback_info['context'], position=new_position)
+            self.is_playing = True
+            self.ids.stop_start_button.source = PAUSE_BUTTON_SRC
+
 
 
     def time_updater(self, dt):
@@ -155,10 +159,25 @@ class MainLayout(Screen):
         anim.start(widget)
 
     def one_point_mode(self):
-        pass
+        self.manager.get_screen('onepoint').update_states()
+
 
 class OnePointSearchLayout(Screen):
-    pass
+    def update_states(self):
+        self.ids.percentage_label.text = str("{percentage:.0f}%".format(
+            percentage=(self.ids.percentage_slider.value * 100)))
+        self.ids.loudness_slider.disabled = not self.ids.loudness_checkbox.active
+        self.ids.energy_slider.disabled = not self.ids.energy_checkbox.active
+        self.ids.instrumentalness_slider.disabled = not self.ids.instrumentalness_checkbox.active
+        self.ids.tempo_slider.disabled = not self.ids.tempo_checkbox.active
+        self.ids.valence_slider.disabled = not self.ids.valence_checkbox.active
+        self.ids.danceability_slider.disabled = not self.ids.danceability_checkbox.active
+
+    def apply_one_point_search(self):
+        if not self.manager.get_screen('player').current_playlist_id:
+            NoPlaylistLoadedPopup().open()
+            playlist = Playlist()
+            graph = TracksGraph()
 
 
 class PlaylistPopup(Popup):
@@ -189,6 +208,9 @@ class PlaylistPopup(Popup):
     def set_root_playlist(self):
         self.root_widget.set_playlist(self.current_playlist_id)
         self.root_widget.update_loaded_playlist_info(self.playlist_info)
+
+class NoPlaylistLoadedPopup(Popup):
+    pass
 
 class MainApp(App):
     def build(self):

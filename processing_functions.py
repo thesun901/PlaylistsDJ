@@ -15,7 +15,6 @@ def get_audio_features(tracks: list[dict]) -> Optional[list[dict]]:
     tracks_id = []
     for item in tracks:
         tracks_id.append(item['track']['id'])
-    print(tracks_id)
     features_list: Optional[list[dict]] = []
 
     # api call has limit of 100 songs - getting all song features from playlist
@@ -29,7 +28,6 @@ def get_audio_features(tracks: list[dict]) -> Optional[list[dict]]:
             print(e)
             return None
 
-    print(features_list)
     return features_list
 
 
