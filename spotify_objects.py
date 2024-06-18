@@ -1,6 +1,8 @@
 import processing_functions
 from spotify_setup import sp
 import math
+from collections import deque
+import heapq
 
 class Track:
     def __init__(self, song: dict, features: dict):
@@ -40,18 +42,21 @@ class TrackNode:
 
         self.neighbours: set[TrackNode] = set()
 
+    def __lt__(self, other):
+        return True
+
 
 class TracksGraph:
-    def __init__(self, playlist: Playlist):
+    def __init__(self, playlist: Playlist, values_relevancy: dict):
         self.nodes = []
         self._normalize_features(playlist.tracklist)
 
-        self.loudness_relevant = False
-        self.energy_relevant = False
-        self.instrumentalness_relevant = False
-        self.tempo_relevant = True
-        self.valence_relevant = True
-        self.danceability_relevant = True
+        self.loudness_relevant = values_relevancy['loudness']
+        self.energy_relevant = values_relevancy['energy']
+        self.instrumentalness_relevant = values_relevancy['instrumentalness']
+        self.tempo_relevant = values_relevancy['tempo']
+        self.valence_relevant = values_relevancy['valence']
+        self.danceability_relevant = values_relevancy['danceability']
 
         self.build_graph()
 
@@ -80,7 +85,7 @@ class TracksGraph:
 
         for track in tracks:
             node = TrackNode(track)
-            node.loudness_dimention = (track.loudness - max_loudness) / -max_loudness  # normalize negative value
+            node.loudness_dimention = max_loudness / track.loudness
             node.energy_dimention = track.energy / max_energy if max_energy else 0
             node.instrumentalness_dimention = track.instrumentalness / max_instrumentalness if max_instrumentalness else 0
             node.tempo_dimention = track.tempo / max_tempo if max_tempo else 0
@@ -140,7 +145,7 @@ class TracksGraph:
         self._ensure_connectivity()
 
     def _ensure_connectivity(self):
-        # Perform BFS to check connectivity
+        # Perform DFS to check connectivity
         visited = set()
         to_visit = [self.nodes[0]] if self.nodes else []
 
@@ -169,7 +174,6 @@ class TracksGraph:
 
     def get_one_point_queue(self, values: dict, percentage: float):
         amount: int = int(len(self.nodes) * percentage)
-        queue: list = []
         loudness: float = values['loudness']
         energy: float = values['energy']
         instrumentalness: float = values['instrumentalness']
@@ -184,14 +188,90 @@ class TracksGraph:
 
         distances.sort(key=lambda x: x[1])
 
+        queue: list = []
         for i in range(amount):
             queue.append(distances[i][0].track.uri)
 
         return queue
 
+    def find_route_between_points(self, start_vals: dict, end_vals: dict) -> list[str]:
+        """
+        Finds the route between the closest node to start_vals and the closest node to end_vals.
+
+        :param start_vals: Dictionary of attribute values for the starting point.
+        :param end_vals: Dictionary of attribute values for the ending point.
+        :return: List of track URIs representing the route.
+        """
+        start_loudness = start_vals['loudness']
+        start_energy = start_vals['energy']
+        start_instrumentalness = start_vals['instrumentalness']
+        start_tempo = start_vals['tempo']
+        start_valence = start_vals['valence']
+        start_danceability = start_vals['danceability']
+
+        end_loudness = end_vals['loudness']
+        end_energy = end_vals['energy']
+        end_instrumentalness = end_vals['instrumentalness']
+        end_tempo = end_vals['tempo']
+        end_valence = end_vals['valence']
+        end_danceability = end_vals['danceability']
+
+        # Find closest start node
+        start_node = min(self.nodes, key=lambda node: self._distance_point(node, start_loudness, start_energy,
+                                                                           start_instrumentalness, start_tempo,
+                                                                           start_valence, start_danceability))
+
+        # Find closest end node
+        end_node = min(self.nodes,key=lambda node: self._distance_point(node, end_loudness, end_energy, end_instrumentalness,
+                                                             end_tempo, end_valence, end_danceability))
+
+        # Find the route using Dijkstra's algorithm
+        route_nodes = self._dijkstra(start_node, end_node)
+
+        queue: list = []
+        for node in route_nodes:
+            queue.append(node.track.uri)
+            print(node.track.name)
+
+        return queue
+
+    def _dijkstra(self, start_node: TrackNode, end_node: TrackNode) -> list[TrackNode]:
+        """
+        Finds the shortest path between start_node and end_node using Dijkstra's algorithm.
+
+        :param start_node: Starting track node.
+        :param end_node: Ending track node.
+        :return: List of TrackNodes representing the path from start to end.
+        """
+        # Priority queue to store (distance, node, path)
+        priority_queue = [(0, start_node, [start_node])]
+        # Dictionary to store the shortest distance to each node
+        distances = {start_node: 0}
+        # Set to store visited nodes
+        visited = set()
+
+        while priority_queue:
+            current_distance, current_node, path = heapq.heappop(priority_queue)
+            if current_node in visited:
+                continue
+
+            visited.add(current_node)
+
+            if current_node == end_node:
+                return path
+
+            for neighbour in current_node.neighbours:
+                distance = self._distance(current_node, neighbour)
+                new_distance = current_distance + distance
+
+                if neighbour not in distances or new_distance < distances[neighbour]:
+                    distances[neighbour] = new_distance
+                    heapq.heappush(priority_queue, (new_distance, neighbour, path + [neighbour]))
+
+        return []
 
 
-# Check the graph structure
+    # Check the graph structure
 def print_graph(graph):
     print("Track Graph")
     print("===========")
@@ -215,32 +295,38 @@ def is_connected(graph):
     return len(visited) == len(graph.nodes)
 
 if __name__ == '__main__':
-    playlist_id = processing_functions.get_playlist_id_from_url('https://open.spotify.com/playlist/657uAFl5hSMc8f493QEid0?si=64605511a4d243bc')
-    pl = Playlist(sp.playlist(playlist_id))
-    vals = {
-        "loudness": 1,
-        "energy": 1,
+
+    relevancy: dict = {
+        "loudness": True,
+        "energy": True,
+        "instrumentalness": False,
+        "tempo": True,
+        "valence": False,
+        "danceability": False
+    }
+    vals1: dict = {
+        "loudness": 0,
+        "energy":0,
         "instrumentalness": 1,
         "tempo": 0,
         "valence": 0,
         "danceability": 0
     }
-    graph = TracksGraph(pl)
-    print(graph.get_one_point_queue(vals, 0.5))
+    vals2: dict = {
+        "loudness": 1,
+        "energy": 1,
+        "instrumentalness": 1,
+        "tempo": 1,
+        "valence": 1,
+        "danceability": 1
+    }
 
-    # Create graph
+    playlist_id = processing_functions.get_playlist_id_from_url('https://open.spotify.com/playlist/2qFlUcj6WcXDzvzO0XlTo6?si=d491a85bd3114701')
+    pl = Playlist(sp.playlist(playlist_id))
+    graph = TracksGraph(pl, relevancy)
+    route = graph.find_route_between_points(vals1, vals2)
+    print("Route between points:", route)
 
-    # Print the graph
-
-
-    # print_graph(graph)
-
-
-
-
-    # Check if the graph is connected
-   # connected = is_connected(graph)
-   # print("Is graph fully connected?", connected)
 
 
 

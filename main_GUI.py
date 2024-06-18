@@ -1,4 +1,5 @@
 import os
+import path
 #os.environ["KIVY_NO_CONSOLELOG"] = "1"
 from spotify_setup import sp
 from kivy.app import App
@@ -47,9 +48,14 @@ class MainLayout(Screen):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.time_updater, UPDATE_INTERVAL_SEC)
         try:
+            self.start_animations()
             self.update_current_info()
         except:
             pass
+
+
+
+
 
     def set_playlist(self, playlist_id: str):
         self.current_playlist_id = playlist_id
@@ -75,6 +81,7 @@ class MainLayout(Screen):
     def update_current_info(self):
         try:
             playback_info = get_current_playback_state()
+            self.update_queue()
         except:
             return
 
@@ -132,13 +139,16 @@ class MainLayout(Screen):
 
     def change_song_moment(self, touch, widget):
         if touch.grab_current == widget:
+            self.ids.stop_start_button.source = PAUSE_BUTTON_SRC
             playback_info = get_current_playback_state()
             new_position: int = int(widget.value * self.current_song_length)
             self.current_song_timestamp = new_position
             start_new_playback(playback_info['item'], playback_info['context'], position=new_position)
             self.is_playing = True
-            self.ids.stop_start_button.source = PAUSE_BUTTON_SRC
 
+    def start_animations(self):
+       self.breathe_animate(self.ids.ops_button)
+       self.breathe_animate(self.ids.ts_button)
 
 
     def time_updater(self, dt):
@@ -158,26 +168,132 @@ class MainLayout(Screen):
         )
         anim.start(widget)
 
+    def breathe_animate(self, widget, *args):
+        beggining_size = widget.default_size
+        anim = Animation(
+            size_hint=(widget.size_hint_x * 1.02, widget.size_hint_y * 1.02),
+            duration=1.2
+        )
+        anim += Animation(
+            size_hint=beggining_size,
+            duration=1.2
+        )
+
+        anim.repeat = True
+        anim.start(widget)
+
+
     def one_point_mode(self):
         self.manager.get_screen('onepoint').update_states()
+
+    def update_queue(self):
+        self.ids.recycle_data.data = []
+        queue = sp.queue()
+        playing = queue['currently_playing']
+        self.ids.recycle_data.data.append({'text': playing['name'], 'size_hint': (1, None), 'height': 45,
+                                           'background_color': (0.9, 0.25, 0.9, 0.6), 'uri': playing['uri']})
+        for element in queue['queue']:
+            self.ids.recycle_data.data.append({'text': element['name'], 'size_hint': (1, None), 'height': 45,
+                                               'background_color': (0.25, 0.25, 0.25, 0), 'uri': element['uri']})
 
 
 class OnePointSearchLayout(Screen):
     def update_states(self):
         self.ids.percentage_label.text = str("{percentage:.0f}%".format(
             percentage=(self.ids.percentage_slider.value * 100)))
-        self.ids.loudness_slider.disabled = not self.ids.loudness_checkbox.active
-        self.ids.energy_slider.disabled = not self.ids.energy_checkbox.active
-        self.ids.instrumentalness_slider.disabled = not self.ids.instrumentalness_checkbox.active
-        self.ids.tempo_slider.disabled = not self.ids.tempo_checkbox.active
-        self.ids.valence_slider.disabled = not self.ids.valence_checkbox.active
-        self.ids.danceability_slider.disabled = not self.ids.danceability_checkbox.active
+        features = [
+            'loudness', 'energy', 'instrumentalness',
+            'tempo', 'valence', 'danceability'
+        ]
+
+        for feature in features:
+            active = getattr(self.ids, f'{feature}_checkbox').active
+            getattr(self.ids, f'{feature}_slider').disabled = not active
+
 
     def apply_one_point_search(self):
-        if not self.manager.get_screen('player').current_playlist_id:
+        playlist_id = self.manager.get_screen('player').current_playlist_id
+        if not playlist_id:
             NoPlaylistLoadedPopup().open()
-            playlist = Playlist()
-            graph = TracksGraph()
+            return
+
+        relevancy_dict = {
+            'loudness' : self.ids.loudness_checkbox.active,
+            'energy': self.ids.energy_checkbox.active,
+            'instrumentalness': self.ids.instrumentalness_checkbox.active,
+            'tempo': self.ids.tempo_checkbox.active,
+            'valence': self.ids.valence_checkbox.active,
+            'danceability': self.ids.danceability_checkbox.active
+        }
+
+        values = {
+            'loudness': self.ids.loudness_slider.value,
+            'energy': self.ids.energy_slider.value,
+            'instrumentalness': self.ids.instrumentalness_slider.value,
+            'tempo': self.ids.tempo_slider.value,
+            'valence': self.ids.valence_slider.value,
+            'danceability': self.ids.danceability_slider.value
+        }
+
+        playlist = Playlist(sp.playlist(playlist_id))
+        graph = TracksGraph(playlist, relevancy_dict)
+        queue = graph.get_one_point_queue(values, self.ids.percentage_slider.value)
+        for uri in queue:
+            sp.add_to_queue(uri)
+        self.manager.get_screen('player').update_queue()
+
+class RouteSearchLayout(Screen):
+    def update_states(self):
+        features = [
+            'loudness', 'energy', 'instrumentalness',
+            'tempo', 'valence', 'danceability'
+        ]
+
+        for feature in features:
+            active = getattr(self.ids, f'{feature}_checkbox').active
+            getattr(self.ids, f'{feature}_slider_start').disabled = not active
+            getattr(self.ids, f'{feature}_slider_end').disabled = not active
+
+    def apply_route_search(self):
+        playlist_id = self.manager.get_screen('player').current_playlist_id
+        if not playlist_id:
+            NoPlaylistLoadedPopup().open()
+            return
+
+        relevancy_dict = {
+            'loudness': self.ids.loudness_checkbox.active,
+            'energy': self.ids.energy_checkbox.active,
+            'instrumentalness': self.ids.instrumentalness_checkbox.active,
+            'tempo': self.ids.tempo_checkbox.active,
+            'valence': self.ids.valence_checkbox.active,
+            'danceability': self.ids.danceability_checkbox.active
+        }
+
+        values_start = {
+            'loudness': self.ids.loudness_slider_start.value,
+            'energy': self.ids.energy_slider_start.value,
+            'instrumentalness': self.ids.instrumentalness_slider_start.value,
+            'tempo': self.ids.tempo_slider_start.value,
+            'valence': self.ids.valence_slider_start.value,
+            'danceability': self.ids.danceability_slider_start.value
+        }
+
+        values_end = {
+            'loudness': self.ids.loudness_slider_end.value,
+            'energy': self.ids.energy_slider_end.value,
+            'instrumentalness': self.ids.instrumentalness_slider_end.value,
+            'tempo': self.ids.tempo_slider_end.value,
+            'valence': self.ids.valence_slider_end.value,
+            'danceability': self.ids.danceability_slider_end.value
+        }
+
+        playlist = Playlist(sp.playlist(playlist_id))
+        graph = TracksGraph(playlist, relevancy_dict)
+        queue = graph.find_route_between_points(values_start, values_end)
+        for uri in queue:
+            sp.add_to_queue(uri)
+        self.manager.get_screen('player').update_queue()
+
 
 
 class PlaylistPopup(Popup):
@@ -217,6 +333,7 @@ class MainApp(App):
         sm = ScreenManager()
         sm.add_widget(MainLayout(name='player'))
         sm.add_widget(OnePointSearchLayout(name='onepoint'))
+        sm.add_widget(RouteSearchLayout(name='routesearch'))
         return sm
 
 

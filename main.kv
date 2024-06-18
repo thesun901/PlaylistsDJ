@@ -1,9 +1,26 @@
 #:import Factory kivy.factory.Factory
+#: include one_point_search.kv
+#: include route_search.kv
 WindowManager:
     MainLayout:
     OnePointSearchLayout:
         id: one_point_layout
+    RouteSearchLayout
 
+<SelectableLabel@Button>:
+    size_hint_y: None
+    height: 45
+    background_normal: ''
+    background_color: (0.25, 0.25, 0.25, 0)
+    color: (1, 1, 1, 1)
+    canvas.before:
+        Color:
+            rgba: 0.4, 0.4, 0.4, 0.9
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10,]
+        #   on_release: app.root.get_click(self.text, self.station_id)
 
 <VioletColor@Color>
     rgba: 0.9, 0.25, 0.9, 1
@@ -12,6 +29,22 @@ WindowManager:
     source: 'magic_circle.png'
 
 #-----------------------------------------POPUPS---------------------------------------------------------
+<NoPlaylistLoadedPopup@Popup>
+    auto_dismiss: True
+    title: "You should load playlist!"
+    separator_color: 0.9, 0.25, 0.9, 1
+    size_hint: 0.7, 0.7
+
+    FloatLayout:
+        width: root.width - 100
+        height: root.height - 100
+
+        Label:
+            text: "It seems you haven't loaded playlist to app yet!\nGo back to main screen and load your playlist!"
+            size_hint: 0.65, 0.3
+            pos_hint: {"x": 0.3, "center_y": 0.6}
+
+
 <PlaylistPopup@Popup>
     auto_dismiss: True
     title: "Load playlist"
@@ -131,20 +164,7 @@ WindowManager:
             halign: "left"
             valign: "middle"
 
-<NoPlaylistLoadedPopup@Popup>
-    auto_dismiss: True
-    title: "You should load playlist!"
-    separator_color: 0.9, 0.25, 0.9, 1
-    size_hint: 0.7, 0.7
 
-    FloatLayout:
-        width: root.width - 100
-        height: root.height - 100
-
-        Label:
-            text: "It seems you haven't loaded playlist to app yet!\nGo back to main screen and load your playlist!"
-            size_hint: 0.65, 0.3
-            pos_hint: {"x": 0.3, "center_y": 0.6}
 
 #-----------------------------------------POPUPS---------------------------------------------------------
 
@@ -208,7 +228,7 @@ WindowManager:
             id: playlist_name
             size_hint: 0.15, 0.1
             text_size: self.size
-            pos_hint: {"center_x": 0.2, "center_y": 0.48}
+            pos_hint: {"center_x": 0.2, "center_y": 0.6}
             text: ""
             halign: "center"
             valign: "bottom"
@@ -216,7 +236,7 @@ WindowManager:
         AsyncImage:
             id: playlist_image
             size_hint: 0.15, 0.2
-            pos_hint: {"center_x": 0.2, "center_y": 0.58}
+            pos_hint: {"center_x": 0.2, "center_y": 0.7}
             fit_mode: "contain"
             color: 0, 0, 0, 0
 
@@ -228,8 +248,8 @@ WindowManager:
             default_size: 0.075, 0.075
             pos_hint: {"center_x": 0.5, "center_y": 0.15}
             on_press:
-                root.click_animate(self);
-                root.play_pause(self)
+                root.play_pause(self);
+                root.click_animate(self)
 
         ImageButton:
             id: previous
@@ -238,8 +258,8 @@ WindowManager:
             default_size: 0.04, 0.04
             pos_hint: {"center_x": 0.42, "center_y": 0.15}
             on_press:
-                root.click_animate(self);
-                root.previous_song()
+                root.previous_song();
+                root.click_animate(self)
 
 
         ImageButton:
@@ -249,22 +269,46 @@ WindowManager:
             default_size: 0.04, 0.04
             pos_hint: {"center_x": 0.58, "center_y": 0.15}
             on_press:
-                root.click_animate(self);
-                root.next_song()
+                root.next_song();
+                root.click_animate(self)
+
         Image:
             source: "pictures/player_background.png"
             size_hint: 0.58, 0.1
             pos_hint: {"center_x": 0.5, "center_y": 0.07}
             fit_mode: "contain"
 
-        Button:
-            size_hint: 0.2, 0.1
-            pos_hint: {"center_x": 0.8, "center_y": 0.2}
-            text: "onepoint"
+        ImageButton:
+            id: ts_button
+            color: 1, 1, 1, 0.8
+            source: "pictures/one_point_search.png"
+            size_hint: 0.2, 0.2
+            default_size: 0.2, 0.2
+            pos_hint: {"center_x": 0.8, "center_y": 0.7}
             on_release:
-                root.manager.transition.direction = "left"
-                root.one_point_mode()
-                app.root.current = "onepoint"
+                root.manager.transition.direction = "left";
+                root.one_point_mode();
+                app.root.current = "onepoint";
+
+            on_press:
+                root.click_animate(self)
+
+
+
+        ImageButton:
+            id: ops_button
+            color: 1, 1, 1, 0.8
+            source: "pictures/route_search.png"
+            size_hint: 0.2, 0.2
+            default_size: 0.2, 0.2
+            pos_hint: {"center_x": 0.8, "center_y": 0.4}
+            on_release:
+                root.manager.transition.direction = "left";
+                root.one_point_mode();
+                app.root.current = "routesearch";
+
+            on_press:
+                root.click_animate(self)
 
         Slider:
             id: time_bar
@@ -284,283 +328,23 @@ WindowManager:
             value: 0.5
             on_touch_up:
                 root.change_song_moment(args[1], self)
-#----------------------------------------MAIN-LAYOUT---------------------------------------------------
 
-<OnePointSearchLayout>:
-    FloatLayout:
-        size: root.width, root.height
-        canvas.before:
-            Color:
-                rgba: 0.1, 0.1, 0.1, 1
-            Rectangle:
-                pos: self.pos
-                size: self.size
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            id: queue
+            size_hint: 0.2, 0.4
+            pos_hint: {"x": 0.05, "y": 0.15}
 
-        Label:
-            pos_hint: {"center_x": 0.2, "center_y": 0.85}
-            size_hint: 0.2, 0.2
-            text: "Loudness"
-
-        CheckBox:
-            id: loudness_checkbox
-            pos_hint: {"center_x": 0.1, "center_y": 0.8}
-            size_hint: 0.05, 0.05
-            active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
-            on_release:
-                root.update_states()
-
-        Slider:
-            id: loudness_slider
-            padding: 0
-            cursor_size: 20, 20
-            cursor_image: "pictures/slider_cursor.png"
-            value_track: True
-            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
-            background_width: 5
-            pos_hint: {"center_x": 0.3, "center_y": 0.8}
-            size_hint: 0.3, 0.1
-            min: 0
-            max: 1
-            step: 0.01
-            orientation: 'horizontal'
-            value: 0.5
-
-        Label:
-            pos_hint: {"center_x": 0.2, "center_y": 0.75}
-            size_hint: 0.2, 0.2
-            text: "Energy"
-
-        CheckBox:
-            id: energy_checkbox
-            pos_hint: {"center_x": 0.1, "center_y": 0.7}
-            size_hint: 0.05, 0.05
-            active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
-            on_release:
-                root.update_states()
-        Slider:
-            id: energy_slider
-            padding: 0
-            cursor_size: 20, 20
-            cursor_image: "pictures/slider_cursor.png"
-            value_track: True
-            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
-            background_width: 5
-            pos_hint: {"center_x": 0.3, "center_y": 0.7}
-            size_hint: 0.3, 0.1
-            min: 0
-            max: 1
-            step: 0.01
-            orientation: 'horizontal'
-            value: 0.5
-        Label:
-            pos_hint: {"center_x": 0.2, "center_y": 0.65}
-            size_hint: 0.2, 0.2
-            text: "Instrumentalness"
-
-        CheckBox:
-            id: instrumentalness_checkbox
-            pos_hint: {"center_x": 0.1, "center_y": 0.6}
-            size_hint: 0.05, 0.05
-            active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
-            on_release:
-                root.update_states()
-        Slider:
-            id: instrumentalness_slider
-            padding: 0
-            cursor_size: 20, 20
-            cursor_image: "pictures/slider_cursor.png"
-            value_track: True
-            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
-            background_width: 5
-            pos_hint: {"center_x": 0.3, "center_y": 0.6}
-            size_hint: 0.3, 0.1
-            min: 0
-            max: 1
-            step: 0.01
-            orientation: 'horizontal'
-            value: 0.5
-
-        Label:
-            pos_hint: {"center_x": 0.2, "center_y": 0.55}
-            size_hint: 0.2, 0.2
-            text: "Tempo"
-
-        CheckBox:
-            id: tempo_checkbox
-            pos_hint: {"center_x": 0.1, "center_y": 0.5}
-            size_hint: 0.05, 0.05
-            active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
-            on_release:
-                root.update_states()
-        Slider:
-            id: tempo_slider
-            padding: 0
-            cursor_size: 20, 20
-            cursor_image: "pictures/slider_cursor.png"
-            value_track: True
-            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
-            background_width: 5
-            pos_hint: {"center_x": 0.3, "center_y": 0.5}
-            size_hint: 0.3, 0.1
-            min: 0
-            max: 1
-            step: 0.01
-            orientation: 'horizontal'
-            value: 0.5
-
-        Label:
-            pos_hint: {"center_x": 0.2, "center_y": 0.45}
-            size_hint: 0.2, 0.2
-            text: "Valence"
-
-        CheckBox:
-            id: valence_checkbox
-            pos_hint: {"center_x": 0.1, "center_y": 0.4}
-            size_hint: 0.05, 0.05
-            active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
-            on_release:
-                root.update_states()
-
-        Slider:
-            id: valence_slider
-            padding: 0
-            cursor_size: 20, 20
-            cursor_image: "pictures/slider_cursor.png"
-            value_track: True
-            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
-            background_width: 5
-            pos_hint: {"center_x": 0.3, "center_y": 0.4}
-            size_hint: 0.3, 0.1
-            min: 0
-            max: 1
-            step: 0.01
-            orientation: 'horizontal'
-            value: 0.5
-
-        Label:
-            pos_hint: {"center_x": 0.2, "center_y": 0.35}
-            size_hint: 0.2, 0.2
-            text: "Danceability"
-
-        CheckBox:
-            id: danceability_checkbox
-            pos_hint: {"center_x": 0.1, "center_y": 0.3}
-            size_hint: 0.05, 0.05
-            active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
-            on_release:
-                root.update_states()
-
-        Slider:
-            id: danceability_slider
-            padding: 0
-            cursor_size: 20, 20
-            cursor_image: "pictures/slider_cursor.png"
-            value_track: True
-            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
-            background_width: 5
-            pos_hint: {"center_x": 0.3, "center_y": 0.3}
-            size_hint: 0.3, 0.1
-            min: 0
-            max: 1
-            step: 0.01
-            orientation: 'horizontal'
-            value: 0.5
-
-        Label:
-            text: "percentage of playlist returned"
-            font_size: 20
-            pos_hint: {"center_x": 0.7, "center_y": 0.65}
-            size_hint: 0.2, 0.2
-            valign: "center"
-            halign: "center"
+            RecycleView:
+                id: recycle_data
+                data: []
+                viewclass: 'SelectableLabel'
+                RecycleBoxLayout:
+                    size_hint: (1,None)
+                    height: self.minimum_height
+                    orientation: 'vertical'
+                    spacing: 5
+                    background_color: 0, 0, 0, 1
 
 
-        Label:
-            id: percentage_label
-            font_size: 40
-            color: (0.9, 0.25, 0.9, 1)
-            pos_hint: {"center_x": 0.7, "center_y": 0.5}
-            size_hint: 0.2, 0.2
-            valign: "center"
-            halign: "center"
-
-        Slider:
-            id: percentage_slider
-            padding: 0
-            cursor_size: 20, 20
-            cursor_image: "pictures/slider_cursor.png"
-            value_track: True
-            value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
-            background_width: 5
-            pos_hint: {"center_x": 0.7, "center_y": 0.3}
-            size_hint: 0.4, 0.1
-            min: 0
-            max: 0.5
-            step: 0.01
-            orientation: 'horizontal'
-            value: 0.5
-            on_touch_move:
-                root.update_states()
-
-        Button:
-            text: "Back"
-            pos_hint: {"center_x": 0.3, "center_y": 0.1}
-            size_hint: 0.2, 0.1
-            background_color: 0,0,0,0
-            bold: True
-            color: 1, 1, 1, 1
-            canvas.before:
-                Color:
-                    rgba: (0.5, 0.5, 0.5, 1) if self.state=='normal' else (0,.7,.7,1)
-                RoundedRectangle:
-                    pos: self.pos
-                    size: self.size
-                    radius: [15,]
-            on_release:
-                root.manager.transition.direction = "right"
-                app.root.current = "player"
-
-        Button:
-            text: "Apply"
-            pos_hint: {"center_x": 0.4, "center_y": 0.1}
-            size_hint: 0.2, 0.1
-            background_color: 0,0,0,0
-            bold: True
-            color: 1, 1, 1, 1
-            canvas.before:
-                Color:
-                    rgba: (0.9, 0.25, 0.9, 1) if self.state=='normal' else (0,.7,.7,1)
-                RoundedRectangle:
-                    pos: self.pos
-                    size: self.size
-                    radius: [15,]
-            on_release:
-                root.apply_one_point_search()
-                root.manager.transition.direction = "right"
-                app.root.current = "player"
