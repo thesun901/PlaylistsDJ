@@ -12,21 +12,29 @@
                 size: self.size
 
         Label:
-            pos_hint: {"center_x": 0.3, "center_y": 0.92}
+            pos_hint: {"center_x": 0.5, "center_y": 0.94}
+            size_hint: 0.2, 0.2
+            text: "Find smooth songs route between two moods"
+            font_size: 28
+            bold: True
+            color: 0.95, 0.6, 0, 1
+
+        Label:
+            pos_hint: {"center_x": 0.3, "center_y": 0.87}
             size_hint: 0.2, 0.2
             text: "Starting values"
             color: (0.9, 0.25, 0.9, 1)
             bold: True
 
         Label:
-            pos_hint: {"center_x": 0.75, "center_y": 0.92}
+            pos_hint: {"center_x": 0.75, "center_y": 0.87}
             size_hint: 0.2, 0.2
             text: "Ending values"
             color: (0.95, 0.6, 0, 1)
             bold: True
 
         Label:
-            pos_hint: {"center_x": 0.25, "center_y": 0.85}
+            pos_hint: {"center_x": 0.2, "center_y": 0.85}
             size_hint: 0.2, 0.2
             text: "Loudness"
 
@@ -35,8 +43,8 @@
             pos_hint: {"center_x": 0.1, "center_y": 0.8}
             size_hint: 0.05, 0.05
             active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
+            background_checkbox_down: app.resource_path("pictures/checkbox_down.png")
+            background_checkbox_normal: app.resource_path("pictures/checkbox_normal.png")
             on_release:
                 root.update_states()
 
@@ -47,8 +55,8 @@
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
             value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.8}
             size_hint: 0.3, 0.1
@@ -59,7 +67,7 @@
             value: 0.5
 
         Label:
-            pos_hint: {"center_x": 0.25, "center_y": 0.75}
+            pos_hint: {"center_x": 0.2, "center_y": 0.75}
             size_hint: 0.2, 0.2
             text: "Energy"
 
@@ -68,8 +76,8 @@
             pos_hint: {"center_x": 0.1, "center_y": 0.7}
             size_hint: 0.05, 0.05
             active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
+            background_checkbox_down: app.resource_path("pictures/checkbox_down.png")
+            background_checkbox_normal: app.resource_path("pictures/checkbox_normal.png")
             on_release:
                 root.update_states()
         Slider:
@@ -79,8 +87,8 @@
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
             value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.7}
             size_hint: 0.3, 0.1
@@ -90,7 +98,7 @@
             orientation: 'horizontal'
             value: 0.5
         Label:
-            pos_hint: {"center_x": 0.25, "center_y": 0.65}
+            pos_hint: {"center_x": 0.2, "center_y": 0.65}
             size_hint: 0.2, 0.2
             text: "Instrumentalness"
 
@@ -99,8 +107,8 @@
             pos_hint: {"center_x": 0.1, "center_y": 0.6}
             size_hint: 0.05, 0.05
             active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
+            background_checkbox_down: app.resource_path("pictures/checkbox_down.png")
+            background_checkbox_normal: app.resource_path("pictures/checkbox_normal.png")
             on_release:
                 root.update_states()
         Slider:
@@ -110,8 +118,8 @@
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
             value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.6}
             size_hint: 0.3, 0.1
@@ -122,7 +130,7 @@
             value: 0.5
 
         Label:
-            pos_hint: {"center_x": 0.25, "center_y": 0.55}
+            pos_hint: {"center_x": 0.2, "center_y": 0.55}
             size_hint: 0.2, 0.2
             text: "Tempo"
 
@@ -131,8 +139,8 @@
             pos_hint: {"center_x": 0.1, "center_y": 0.5}
             size_hint: 0.05, 0.05
             active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
+            background_checkbox_down: app.resource_path("pictures/checkbox_down.png")
+            background_checkbox_normal: app.resource_path("pictures/checkbox_normal.png")
             on_release:
                 root.update_states()
         Slider:
@@ -142,8 +150,8 @@
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
             value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.5}
             size_hint: 0.3, 0.1
@@ -154,7 +162,7 @@
             value: 0.5
 
         Label:
-            pos_hint: {"center_x": 0.25, "center_y": 0.45}
+            pos_hint: {"center_x": 0.2, "center_y": 0.45}
             size_hint: 0.2, 0.2
             text: "Valence"
 
@@ -163,8 +171,8 @@
             pos_hint: {"center_x": 0.1, "center_y": 0.4}
             size_hint: 0.05, 0.05
             active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
+            background_checkbox_down: app.resource_path("pictures/checkbox_down.png")
+            background_checkbox_normal: app.resource_path("pictures/checkbox_normal.png")
             on_release:
                 root.update_states()
 
@@ -175,8 +183,8 @@
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
             value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.4}
             size_hint: 0.3, 0.1
@@ -187,7 +195,7 @@
             value: 0.5
 
         Label:
-            pos_hint: {"center_x": 0.25, "center_y": 0.35}
+            pos_hint: {"center_x": 0.2, "center_y": 0.35}
             size_hint: 0.2, 0.2
             text: "Danceability"
 
@@ -196,8 +204,8 @@
             pos_hint: {"center_x": 0.1, "center_y": 0.3}
             size_hint: 0.05, 0.05
             active: True
-            background_checkbox_down: "pictures/checkbox_down.png"
-            background_checkbox_normal: "pictures/checkbox_normal.png"
+            background_checkbox_down: app.resource_path("pictures/checkbox_down.png")
+            background_checkbox_normal: app.resource_path("pictures/checkbox_normal.png")
             on_release:
                 root.update_states()
 
@@ -208,8 +216,8 @@
             cursor_image: "pictures/slider_cursor.png"
             value_track: True
             value_track_color: (0.9, 0.25, 0.9, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.3, "center_y": 0.3}
             size_hint: 0.3, 0.1
@@ -265,8 +273,8 @@
             cursor_image: "pictures/slider_cursor_orange.png"
             value_track: True
             value_track_color: (0.95, 0.6, 0, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.75, "center_y": 0.8}
             size_hint: 0.3, 0.1
@@ -283,8 +291,8 @@
             cursor_image: "pictures/slider_cursor_orange.png"
             value_track: True
             value_track_color: (0.95, 0.6, 0, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.75, "center_y": 0.7}
             size_hint: 0.3, 0.1
@@ -301,8 +309,8 @@
             cursor_image: "pictures/slider_cursor_orange.png"
             value_track: True
             value_track_color: (0.95, 0.6, 0, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.75, "center_y": 0.6}
             size_hint: 0.3, 0.1
@@ -319,8 +327,8 @@
             cursor_image: "pictures/slider_cursor_orange.png"
             value_track: True
             value_track_color: (0.95, 0.6, 0, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.75, "center_y": 0.5}
             size_hint: 0.3, 0.1
@@ -338,8 +346,8 @@
             cursor_image: "pictures/slider_cursor_orange.png"
             value_track: True
             value_track_color: (0.95, 0.6, 0, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.75, "center_y": 0.4}
             size_hint: 0.3, 0.1
@@ -356,8 +364,8 @@
             cursor_image: "pictures/slider_cursor_orange.png"
             value_track: True
             value_track_color: (0.95, 0.6, 0, 1) if self.disabled == False else (0.25, 0.25, 0.25, 1)
-            background_horizontal: "pictures/black.png"
-            cursor_disabled_image: "pictures/no_image.png"
+            background_horizontal: app.resource_path("pictures/black.png")
+            cursor_disabled_image: app.resource_path("pictures/no_image.png")
             background_width: 5
             pos_hint: {"center_x": 0.75, "center_y": 0.3}
             size_hint: 0.3, 0.1

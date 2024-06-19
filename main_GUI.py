@@ -1,5 +1,6 @@
 import os
 import path
+import sys
 #os.environ["KIVY_NO_CONSOLELOG"] = "1"
 from spotify_setup import sp
 from kivy.app import App
@@ -49,12 +50,14 @@ class MainLayout(Screen):
         Clock.schedule_interval(self.time_updater, UPDATE_INTERVAL_SEC)
         try:
             self.start_animations()
-            self.update_current_info()
+            Clock.schedule_once(lambda dt: self.update_current_info())
         except:
             pass
 
 
-
+    def get_to_dir(self):
+        with open(MainApp.resource_path(os.path.join('files', 'dir_to')), 'r') as f:
+            return f.read()
 
 
     def set_playlist(self, playlist_id: str):
@@ -83,15 +86,16 @@ class MainLayout(Screen):
             playback_info = get_current_playback_state()
             self.update_queue()
         except:
+            SthWrongPopup(self).open()
             return
 
         if playback_info:
             if playback_info["is_playing"]:
                 self.is_playing = True
-                self.ids.stop_start_button.source = PAUSE_BUTTON_SRC
+                self.ids.stop_start_button.source = MainApp.resource_path(PAUSE_BUTTON_SRC)
             else:
                 self.is_playing = False
-                self.ids.stop_start_button.source = PLAY_BUTTON_SRC
+                self.ids.stop_start_button.source = MainApp.resource_path(PLAY_BUTTON_SRC)
 
             self.current_song_timestamp = playback_info['progress_ms']
             self.current_song_length = playback_info['item']['duration_ms']
@@ -295,6 +299,13 @@ class RouteSearchLayout(Screen):
         self.manager.get_screen('player').update_queue()
 
 
+class SthWrongPopup(Popup):
+    def __init__(self, root_widget: MainLayout, **kwargs):
+        super().__init__(**kwargs)
+        self.root_widget = root_widget
+
+    def root_update_info(self):
+        self.root_widget.update_current_info()
 
 class PlaylistPopup(Popup):
     current_playlist_id: Optional[str] = None
@@ -334,8 +345,16 @@ class MainApp(App):
         sm.add_widget(MainLayout(name='player'))
         sm.add_widget(OnePointSearchLayout(name='onepoint'))
         sm.add_widget(RouteSearchLayout(name='routesearch'))
+        self.title = 'PlaylistsDJ'
         return sm
 
+    @staticmethod
+    def resource_path(relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except:
+            base_path = os.path.abspath('.')
+        return os.path.join(base_path, relative_path)
 
 
 if __name__ == '__main__':

@@ -4,17 +4,18 @@ import math
 from collections import deque
 import heapq
 
+
 class Track:
     def __init__(self, song: dict, features: dict):
         self.id: str = song['id']
-        self.uri = song['uri']
-        self.name = song['name']
-        self.loudness = features['loudness']
-        self.energy = features['energy']
-        self.instrumentalness = features['instrumentalness']
-        self.tempo = features['tempo']
-        self.valence = features['valence']
-        self.danceability = features['danceability']
+        self.uri: str = song['uri']
+        self.name: str = song['name']
+        self.loudness: float = features['loudness']
+        self.energy: float = features['energy']
+        self.instrumentalness: float = features['instrumentalness']
+        self.tempo: float = features['tempo']
+        self.valence: float = features['valence']
+        self.danceability: float = features['danceability']
 
 
 class Playlist:
@@ -48,7 +49,7 @@ class TrackNode:
 
 class TracksGraph:
     def __init__(self, playlist: Playlist, values_relevancy: dict):
-        self.nodes = []
+        self.nodes: list[TrackNode] = []
         self._normalize_features(playlist.tracklist)
 
         self.loudness_relevant = values_relevancy['loudness']
@@ -94,7 +95,6 @@ class TracksGraph:
             self.nodes.append(node)
 
     def _distance(self, node1: TrackNode, node2: TrackNode) -> float:
-        # Calculate distance considering only relevant dimensions
         distance = 0
         if self.loudness_relevant:
             distance += (node1.loudness_dimention - node2.loudness_dimention) ** 2
@@ -112,8 +112,7 @@ class TracksGraph:
 
     def _distance_point(self, node: TrackNode, loudness: float, energy: float,
                         instrumentalness: float, tempo: float, valence: float, danceability: float) -> float:
-        # Calculate distance considering only relevant dimensions
-        distance = 0
+        distance: float = 0
         if self.loudness_relevant:
             distance += (node.loudness_dimention - loudness) ** 2
         if self.energy_relevant:
@@ -172,8 +171,10 @@ class TracksGraph:
                     closest_visited_node.neighbours.add(unvisited_node)
                     visited.add(unvisited_node)
 
-    def get_one_point_queue(self, values: dict, percentage: float):
+    def get_one_point_queue(self, values: dict, percentage: float) -> list:
         amount: int = int(len(self.nodes) * percentage)
+        if amount == 0:
+            amount = 1
         loudness: float = values['loudness']
         energy: float = values['energy']
         instrumentalness: float = values['instrumentalness']
@@ -195,26 +196,19 @@ class TracksGraph:
         return queue
 
     def find_route_between_points(self, start_vals: dict, end_vals: dict) -> list[str]:
-        """
-        Finds the route between the closest node to start_vals and the closest node to end_vals.
+        start_loudness: float = start_vals['loudness']
+        start_energy: float = start_vals['energy']
+        start_instrumentalness: float = start_vals['instrumentalness']
+        start_tempo: float = start_vals['tempo']
+        start_valence: float = start_vals['valence']
+        start_danceability: float = start_vals['danceability']
 
-        :param start_vals: Dictionary of attribute values for the starting point.
-        :param end_vals: Dictionary of attribute values for the ending point.
-        :return: List of track URIs representing the route.
-        """
-        start_loudness = start_vals['loudness']
-        start_energy = start_vals['energy']
-        start_instrumentalness = start_vals['instrumentalness']
-        start_tempo = start_vals['tempo']
-        start_valence = start_vals['valence']
-        start_danceability = start_vals['danceability']
-
-        end_loudness = end_vals['loudness']
-        end_energy = end_vals['energy']
-        end_instrumentalness = end_vals['instrumentalness']
-        end_tempo = end_vals['tempo']
-        end_valence = end_vals['valence']
-        end_danceability = end_vals['danceability']
+        end_loudness: float = end_vals['loudness']
+        end_energy: float = end_vals['energy']
+        end_instrumentalness: float = end_vals['instrumentalness']
+        end_tempo: float = end_vals['tempo']
+        end_valence: float = end_vals['valence']
+        end_danceability: float = end_vals['danceability']
 
         # Find closest start node
         start_node = min(self.nodes, key=lambda node: self._distance_point(node, start_loudness, start_energy,
@@ -222,7 +216,7 @@ class TracksGraph:
                                                                            start_valence, start_danceability))
 
         # Find closest end node
-        end_node = min(self.nodes,key=lambda node: self._distance_point(node, end_loudness, end_energy, end_instrumentalness,
+        end_node = min(self.nodes, key=lambda node: self._distance_point(node, end_loudness, end_energy, end_instrumentalness,
                                                              end_tempo, end_valence, end_danceability))
 
         # Find the route using Dijkstra's algorithm
@@ -231,23 +225,12 @@ class TracksGraph:
         queue: list = []
         for node in route_nodes:
             queue.append(node.track.uri)
-            print(node.track.name)
 
         return queue
 
     def _dijkstra(self, start_node: TrackNode, end_node: TrackNode) -> list[TrackNode]:
-        """
-        Finds the shortest path between start_node and end_node using Dijkstra's algorithm.
-
-        :param start_node: Starting track node.
-        :param end_node: Ending track node.
-        :return: List of TrackNodes representing the path from start to end.
-        """
-        # Priority queue to store (distance, node, path)
-        priority_queue = [(0, start_node, [start_node])]
-        # Dictionary to store the shortest distance to each node
-        distances = {start_node: 0}
-        # Set to store visited nodes
+        priority_queue: list = [(0, start_node, [start_node])]
+        distances: dict = {start_node: 0}
         visited = set()
 
         while priority_queue:
@@ -271,7 +254,7 @@ class TracksGraph:
         return []
 
 
-    # Check the graph structure
+
 def print_graph(graph):
     print("Track Graph")
     print("===========")
@@ -281,7 +264,7 @@ def print_graph(graph):
         print("")
 
 
-# Function to check connectivity
+
 def is_connected(graph):
     visited = set()
     to_visit = [graph.nodes[0]] if graph.nodes else []
