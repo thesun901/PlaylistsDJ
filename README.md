@@ -40,3 +40,30 @@ However if you are really interested in just using this app you can email me at:
 
 
 # Code
+
+## How to run this code?
+
+To run this app you have to connect this app with your own *Spotify for Developers* account, get your *client id* and *client secret*, add .env file and put your *client id* and *client secret* there. Step by step instruction below:
+
+1. Create new  *Spotify for Developers* account on [this site](https://developer.spotify.com)
+2. Go to [Dashboard](https://developer.spotify.com/dashboard) > Create new app
+3. Fill the informations and save your app
+> [!NOTE]
+> Name of your app and description are up to your choice.
+> 
+> Redirect URI isn't really important in here, but if you want to be sure nothing will go wrong you can put simply: 'http://localhost:3000'
+> 
+> To run own copy of this app you **HAVE TO** check at least ***Web API*** and Web ***Playback SDK*** in *Which API/SDKs are you planning to use?* section
+
+4. After your app is created go to your app page and then to settings. You should have your Client ID and Client Secret in there
+> [!WARNING]
+> Do not share your Client ID and Client Secret with anyone!
+
+5. Download PlaylistsDJ from here
+6. Add '.env' file in main project folder
+7. inside '.env' file put those two lines:
+```
+client_id = <YOUR CLIENT ID HERE>
+client_secret = <YOUR CLIENT SECRET HERE>
+```
+8. Now your copy of **PlaylistsDJ** should be ready to run!
