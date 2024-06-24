@@ -7,7 +7,7 @@
   
 * **TTRPGs 🎲** - Instead of juggling multiple playlists you can simply put them in one playlist and use few sliders to easily transition from high-energy battle music to serene tunes for a relaxing tavern visit after a successful fight. You can also use route searching feature to smoothly go from one mood to another! (Fun fact: this app was inspired by the creator’s need for a tool like this for their D&D campaigns!)
 
-* **Amateur DJ-ing 🎧** - Have your Spotify ever surprised you on a party by switching from Pitbull to Lana Del Rey (whole mood ruined! ofc you put Lana in this playlist... but it was for 3am life talks not for Spotify to ruin everyone's dancing mood!). Now you can keep your playlist focused on a consistent mood and avoid situations like this.
+* **Playing music on parties 🎧** - Have your Spotify ever surprised you on a party by switching from Pitbull to Lana Del Rey (whole mood ruined! ofc you put Lana in this playlist... but it was for 3am life talks not for Spotify to ruin everyone's dancing mood!). Now you can keep your playlist focused on a consistent mood and avoid situations like this.
 
 ## Features 
 > [!NOTE]
@@ -29,7 +29,7 @@
 
 
 ### 3. **Route Searcher**
-**Route Searcher** is a feature that finds smooth, shortest (not by amount of songs but in distance - to read more about this read Technology paragraph) path beetween two chosen set of parameters.
+**Route Searcher** is a feature that finds smooth, shortest path beetween two chosen set of parameters.
 ![image](https://github.com/thesun901/PlaylistsDJ/assets/70859223/8d56cb8b-dc99-4649-81c2-8f39c011e6ed)
 
 ## Downloading
@@ -67,3 +67,13 @@ client_id = <YOUR CLIENT ID HERE>
 client_secret = <YOUR CLIENT SECRET HERE>
 ```
 8. Now your copy of **PlaylistsDJ** should be ready to run!
+
+
+## Structure
+
+Here's quick summary about content of files:
+- ***spotify_setup.py*** - authorizes usage of Spotify API using [spotipy module](https://spotipy.readthedocs.io/en/2.24.0/) from this file you should import *sp* variable to make Spotify API calls
+- ***main_GUI.py*** - contains functionalities of kivy widgets - from here some API calls are being made directly
+- ***main.kv, one_point_search.kv, route_search.kv*** - structural files in [kvlang](https://kivy.org/doc/stable/guide/lang.html) that describe placement of widgets on **Player, Mood Searcher** and **Route Searcher** screens
+- ***spotify_objects.py*** - defines Playlist, Track, TrackNode and TracksGraph classes. TracksGraph converts Playlist object to a n-dimentional graph containing Tracks represented as TrackNodes; implements **Mood Searcher** (just by finding closests songs to chosen mood, which doesnt require using graph) and **Route Searcher** (using Dijkstra Algorithm) functionalities
+- ***playback_state_functions.py, processing_functions.py*** - contain some helping functions for example: getting playlistID from given URL, getting all tracks from given playlistID etc.
