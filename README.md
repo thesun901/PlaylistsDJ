@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> Due to massive cuts in Spotify API functionalities I am sad to inform that project PlaylistDJ is no longer usable :(
+
+
+
 # About Project
 
 ## Vision
