@@ -1,22 +1,20 @@
 import os
-import path
 import sys
 #os.environ["KIVY_NO_CONSOLELOG"] = "1"
-from spotify_setup import sp
+from business.spotify_setup import sp
 from kivy.app import App
 from kivy.animation import Animation
-from kivy.uix.button import ButtonBehavior
+from kivy.uix.button import ButtonBehavior, Button
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
 from kivy.config import Config
 from kivy.properties import VariableListProperty
-from processing_functions import get_playlist_id_from_url
+from utils.processing_functions import get_playlist_id_from_url
 from typing import Optional
-from playback_state_functions import start_new_playback, get_current_playback_state, play_pause
-from spotify_objects import TracksGraph, Playlist
-from kivy.lang import Builder
+from business.playback_state_functions import start_new_playback, get_current_playback_state, play_pause
+from utils.spotify_objects import TracksGraph, Playlist
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '720')
@@ -30,9 +28,9 @@ UPDATE_INTERVAL_SEC: float = 0.3
 class ImageButton(ButtonBehavior, Image):
     pass
 
+
 class WindowManager(ScreenManager):
     pass
-
 
 
 class MainLayout(Screen):
@@ -351,9 +349,12 @@ class MainApp(App):
     @staticmethod
     def resource_path(relative_path):
         try:
+            # When running as a bundled executable (PyInstaller)
             base_path = sys._MEIPASS
-        except:
-            base_path = os.path.abspath('.')
+        except AttributeError:
+            # When running as a normal Python script
+            base_path = os.path.dirname(os.path.dirname(__file__))
+
         return os.path.join(base_path, relative_path)
 
 

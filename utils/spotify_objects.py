@@ -1,7 +1,6 @@
-import processing_functions
-from spotify_setup import sp
+from utils import processing_functions
+from business.spotify_setup import sp
 import math
-from collections import deque
 import heapq
 
 

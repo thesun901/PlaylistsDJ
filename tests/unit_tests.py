@@ -1,8 +1,7 @@
 import pytest
-import math
-from spotify_objects import Track, TrackNode, Playlist, TracksGraph
-from spotify_setup import sp
-from processing_functions import get_playlist_id_from_url, get_audio_features, get_all_tracks
+from utils.spotify_objects import Playlist, TracksGraph
+from business.spotify_setup import sp
+from utils.processing_functions import get_playlist_id_from_url, get_all_tracks
 
 playlist_proper_id = '3KfCzf29xRbqCiadoqEcDr'
 test_playlist_dict: dict = sp.playlist(playlist_proper_id)

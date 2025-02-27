@@ -1,4 +1,4 @@
-from spotify_setup import sp
+from business.spotify_setup import sp
 from typing import Optional, Match
 import re
 

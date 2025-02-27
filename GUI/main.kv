@@ -1,6 +1,6 @@
 #:import Factory kivy.factory.Factory
-#: include one_point_search.kv
-#: include route_search.kv
+#: include GUI/one_point_search.kv
+#: include GUI/route_search.kv
 WindowManager:
     MainLayout:
     OnePointSearchLayout:
@@ -14,8 +14,6 @@ WindowManager:
     font_size: 13
     background_color: (0.25, 0.25, 0.25, 0)
     color: (1, 1, 1, 1)
-
-
 
 
 <VioletColor@Color>
@@ -107,23 +105,6 @@ WindowManager:
             on_release:
                 root.set_root_playlist()
                 root.dismiss()
-
-
-#        Button:
-#            pos_hint: {"center_x": 0.5, "center_y": 0.1}
-#            size_hint: 0.25, 0.10
-#            background_color: 0,0,0,0
-#            text: "Load favourites"
-#            bold: True
-#            color: 1, 1, 1, 1
-#            canvas.before:
-#                Color:
-#                    rgba: (0.116, 0.843, 0.376, 1) if self.state=='normal' else (0,.7,.7,1)
-#                RoundedRectangle:
-#                    pos: self.pos
-#                    size: self.size
-#                    radius: [25,]
-#            on_release:
 
         Button:
             pos_hint: {"center_x": 0.35, "center_y": 0.1}
@@ -340,7 +321,6 @@ WindowManager:
                 root.click_animate(self)
 
 
-
         ImageButton:
             id: ops_button
             color: 1, 1, 1, 0.8
@@ -415,5 +395,3 @@ WindowManager:
                     orientation: 'vertical'
                     spacing: 5
                     background_color: 0, 0, 0, 1
-
-
